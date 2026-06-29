@@ -16,6 +16,15 @@
 | 언어 | TypeScript |
 | 테스트 | Vitest |
 
+## 디자인 시스템
+
+UI는 **Toss Design System (TDS)** 을 참고한다.
+메인 컬러는 rose로 유지하되, 컴포넌트 구조·간격·타이포그래피는 TDS 가이드를 따른다.
+
+- 공식 문서: https://tossmini-docs.toss.im/tds-mobile/
+- Pretendard Variable 폰트 사용
+- 주요 컴포넌트: Button (fill/weak), Card, ListRow, Top, BottomCTA, Paragraph
+
 ---
 
 ## 구현 태스크

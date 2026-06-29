@@ -1,38 +1,63 @@
 import Link from 'next/link'
 import Button from '@/components/ui/Button'
 
+const features = [
+  { emoji: '🔗', label: '링크 공유', desc: '카카오톡으로 간편 공유' },
+  { emoji: '💳', label: '간편 결제', desc: '토스페이먼츠 연동' },
+  { emoji: '🎁', label: '선물 전달', desc: '실시간 달성률 확인' },
+]
+
 export default function LandingPage() {
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center px-4">
-      <div className="w-full max-w-sm text-center">
-        <div className="mb-8">
-          <div className="text-[80px] leading-none mb-6">🎂</div>
-          <h1 className="text-[28px] font-bold text-gray-900 mb-3 leading-tight">모아모아</h1>
-          <p className="text-base text-gray-500 leading-relaxed">
-            소중한 사람의 생일 선물을
-            <br />
-            함께 준비해보세요
-          </p>
+    <main className="min-h-screen flex flex-col items-center justify-center px-5 py-12">
+      <div className="w-full max-w-[390px] flex flex-col gap-10">
+
+        {/* Hero */}
+        <div className="text-center flex flex-col items-center gap-4">
+          <div className="w-20 h-20 bg-rose-50 rounded-[24px] flex items-center justify-center text-[44px] shadow-sm">
+            🎂
+          </div>
+          <div className="flex flex-col gap-2">
+            <h1 className="text-[28px] font-bold text-[#191F28] leading-tight tracking-tight">
+              모아모아
+            </h1>
+            <p className="text-[16px] text-gray-500 leading-relaxed">
+              소중한 사람의 생일 선물을
+              <br />
+              함께 준비해보세요
+            </p>
+          </div>
         </div>
 
-        <Link href="/create" className="block">
-          <Button>펀딩 만들기</Button>
-        </Link>
-
-        <div className="mt-12 grid grid-cols-3 gap-4">
-          {[
-            { emoji: '🔗', label: '링크 공유' },
-            { emoji: '💳', label: '간편 결제' },
-            { emoji: '🎁', label: '선물 전달' },
-          ].map(({ emoji, label }) => (
-            <div key={label} className="flex flex-col items-center gap-2">
-              <div className="w-12 h-12 bg-white rounded-2xl shadow-sm flex items-center justify-center text-2xl">
+        {/* Feature Cards */}
+        <div className="flex flex-col gap-3">
+          {features.map(({ emoji, label, desc }) => (
+            <div
+              key={label}
+              className="bg-white rounded-2xl px-5 py-4 flex items-center gap-4"
+              style={{ boxShadow: 'var(--shadow-card)' }}
+            >
+              <div className="w-11 h-11 bg-rose-50 rounded-[14px] flex items-center justify-center text-[22px] shrink-0">
                 {emoji}
               </div>
-              <span className="text-xs text-gray-500 font-medium">{label}</span>
+              <div className="flex flex-col gap-0.5">
+                <span className="text-[15px] font-semibold text-[#191F28]">{label}</span>
+                <span className="text-[13px] text-gray-400">{desc}</span>
+              </div>
             </div>
           ))}
         </div>
+
+        {/* CTA */}
+        <div className="flex flex-col gap-3">
+          <Link href="/create" className="block">
+            <Button size="xlarge">펀딩 만들기</Button>
+          </Link>
+          <p className="text-center text-[13px] text-gray-400">
+            이미 링크가 있다면 공유된 링크로 접속하세요
+          </p>
+        </div>
+
       </div>
     </main>
   )
