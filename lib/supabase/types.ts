@@ -1,57 +1,125 @@
 export type FundingStatus = 'active' | 'closed'
 export type PaymentStatus = 'pending' | 'confirmed' | 'failed'
 
-export interface Funding {
-  id: string
-  creator_email: string
-  title: string
-  description: string | null
-  end_date: string
-  share_token: string
-  status: FundingStatus
-  created_at: string
-}
+// Convenience aliases (for component props)
+export type Funding = Database['public']['Tables']['fundings']['Row']
+export type Gift = Database['public']['Tables']['gifts']['Row']
+export type Payment = Database['public']['Tables']['payments']['Row']
 
-export interface Gift {
-  id: string
-  funding_id: string
-  name: string
-  target_amount: number
-  description: string | null
-  image_url: string | null
-  created_at: string
-}
-
-export interface Payment {
-  id: string
-  funding_id: string
-  participant_name: string
-  message: string | null
-  amount: number
-  order_id: string
-  payment_key: string | null
-  status: PaymentStatus
-  created_at: string
-}
-
-export interface Database {
+export type Database = {
   public: {
     Tables: {
       fundings: {
-        Row: Funding
-        Insert: Omit<Funding, 'id' | 'created_at'> & { id?: string; created_at?: string }
-        Update: Partial<Omit<Funding, 'id'>>
+        Row: {
+          id: string
+          creator_email: string
+          title: string
+          description: string | null
+          end_date: string
+          share_token: string
+          status: FundingStatus
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          creator_email: string
+          title: string
+          description?: string | null
+          end_date: string
+          share_token: string
+          status?: FundingStatus
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          creator_email?: string
+          title?: string
+          description?: string | null
+          end_date?: string
+          share_token?: string
+          status?: FundingStatus
+          created_at?: string
+        }
+        Relationships: []
       }
       gifts: {
-        Row: Gift
-        Insert: Omit<Gift, 'id' | 'created_at'> & { id?: string; created_at?: string }
-        Update: Partial<Omit<Gift, 'id'>>
+        Row: {
+          id: string
+          funding_id: string
+          name: string
+          target_amount: number
+          description: string | null
+          image_url: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          funding_id: string
+          name: string
+          target_amount: number
+          description?: string | null
+          image_url?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          funding_id?: string
+          name?: string
+          target_amount?: number
+          description?: string | null
+          image_url?: string | null
+          created_at?: string
+        }
+        Relationships: []
       }
       payments: {
-        Row: Payment
-        Insert: Omit<Payment, 'id' | 'created_at'> & { id?: string; created_at?: string }
-        Update: Partial<Omit<Payment, 'id'>>
+        Row: {
+          id: string
+          funding_id: string
+          participant_name: string
+          message: string | null
+          amount: number
+          order_id: string
+          payment_key: string | null
+          status: PaymentStatus
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          funding_id: string
+          participant_name: string
+          message?: string | null
+          amount: number
+          order_id: string
+          payment_key?: string | null
+          status?: PaymentStatus
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          funding_id?: string
+          participant_name?: string
+          message?: string | null
+          amount?: number
+          order_id?: string
+          payment_key?: string | null
+          status?: PaymentStatus
+          created_at?: string
+        }
+        Relationships: []
       }
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      [_ in never]: never
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
     }
   }
 }
