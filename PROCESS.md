@@ -102,45 +102,61 @@ UI는 **Toss Design System (TDS)** 을 참고한다.
   - `app/create/actions.ts`
   - `sendOtp` / `verifyOtp` 제거
   - `createFunding(data)` — `creator_user_id = session.user.id` 사용 (creator_email 파라미터 제거)
+  - `uploadFundingImage(file)` — Supabase Storage `funding-images` 버킷에 업로드 후 공개 URL 반환
+  - DB 스키마: `fundings` 테이블에 `image_url text` 컬럼 추가
 
 - [ ] **Task 6: 펀딩 생성 페이지 수정 (1단계 UI)**
   - `app/create/page.tsx` — 클라이언트 컴포넌트
   - Step 1~2 (이메일 OTP) 제거 → 바로 펀딩 정보 입력
   - 펀딩 제목 / 설명 / 마감일 / 선물 목록 입력
+  - **대표 이미지 업로드**: 파일 선택 → Supabase Storage `funding-images` 버킷 업로드 → 공개 URL을 `fundings.image_url` 컬럼에 저장
   - 완료: 공유 링크 표시 + 복사 버튼
 
 ---
 
-### Phase 4 — 공개 펀딩 페이지
+### Phase 4 — 펀딩 페이지
 
-- [x] **Task 7: 공개 펀딩 페이지 — 정적 표시**
+- [ ] **Task 7: 펀딩 피드 페이지**
+  - `app/funding/page.tsx` — 전체 펀딩 목록을 개인 피드(카드 리스트) 형태로 표시
+  - `components/funding/FundingCard.tsx` — 피드에서 사용하는 펀딩 카드
+    - 대표 이미지 (`image_url`) 썸네일 표시 — 없으면 기본 플레이스홀더
+    - 제목, 진행률, D-day 표시
+  - 카드 클릭 → `/funding/[token]` 개별 펀딩 현황 페이지로 이동
+
+- [ ] **Task 8: 펀딩 현황 페이지 — 정적 표시**
+  - `app/funding/[token]/page.tsx` — Server Component (초기 데이터 fetch + 세션 확인)
+    - `isOwner = session?.user?.id === funding.creator_user_id` 판별 후 props로 전달
   - `components/funding/FundingProgress.tsx` — 달성률 바 + 금액
   - `components/funding/GiftList.tsx` — 선물 목록 + 각 달성률
-  - `components/funding/DonorList.tsx` — 후원자 목록
-  - `app/funding/[token]/page.tsx` — Server Component (초기 데이터 fetch)
+  - `components/funding/DonorRolling.tsx` — 후원자 무한 롤링 배너
+    - `isOwner: boolean` prop 수신
+    - **일반 방문자**: `홍*동  "응원합니다!"` (이름 가운데 글자 마스킹)
+    - **주최자**: `홍길동  "응원합니다!"` (풀네임 노출)
+    - CSS 애니메이션(`@keyframes scroll-x`)으로 가로 무한 롤링
+    - 후원자가 없으면 숨김 처리
 
-- [x] **Task 8: Realtime 실시간 업데이트**
+- [ ] **Task 9: Realtime 실시간 업데이트**
   - `app/funding/[token]/FundingRealtime.tsx` — Client Component
   - Supabase Realtime `payments` 테이블 구독
-  - 결제 완료 시 달성률 / 금액 / 후원자 목록 자동 갱신
+  - 결제 완료 시 달성률 / 금액 / 롤링 후원자 목록 자동 갱신 (새 항목을 롤링 큐 맨 뒤에 추가)
 
 ---
 
 ### Phase 5 — 결제
 
-- [ ] **Task 9: 결제 입력 페이지 & createPendingPayment**
+- [ ] **Task 10: 결제 입력 페이지 & createPendingPayment**
   - `components/payment/AmountSelector.tsx` — 빠른 선택(1만/2만/3만/5만) + 자유 입력
   - `app/funding/[token]/pay/page.tsx` — Server Component (funding_id 조회)
   - `app/funding/[token]/pay/PayClient.tsx` — Client Component (결제창 호출)
   - `app/funding/[token]/pay/actions.ts` — `createPendingPayment()`
 
-- [ ] **Task 10: 결제 확인 API Route & 성공/실패 페이지**
+- [ ] **Task 11: 결제 확인 API Route & 성공/실패 페이지**
   - `app/api/payment/confirm/route.ts` — 토스페이먼츠 서버 검증 + DB 업데이트
   - `app/payment/success/page.tsx` — Server Component (orderId로 결제 조회)
   - `app/payment/success/SuccessClient.tsx` — `/api/payment/confirm` 호출 + 결과 표시
   - `app/payment/fail/page.tsx`
 
-- [ ] **Task 11: 카카오 공유**
+- [ ] **Task 12: 카카오 공유**
   - `types/kakao.d.ts` — `window.Kakao` 전역 타입 선언
   - 결제 성공 후 "카카오톡으로 알리기" 팝업 (SuccessClient에 포함)
 
@@ -148,7 +164,7 @@ UI는 **Toss Design System (TDS)** 을 참고한다.
 
 ### Phase 6 — 주최자 관리 (수정)
 
-- [ ] **Task 12: 주최자 관리 페이지 & 정산**
+- [ ] **Task 13: 주최자 관리 페이지 & 정산**
   - `app/funding/[token]/admin/page.tsx` — Server Component (세션 기반 접근 제어)
   - `app/funding/[token]/admin/actions.ts`
   - OTP 재인증 제거 → 세션 `user.id === fundings.creator_user_id` 검증으로 대체
@@ -177,12 +193,13 @@ UI는 **Toss Design System (TDS)** 을 참고한다.
 
 코드로 자동화할 수 없는 항목 (사용자가 직접):
 
-1. **SQL 실행** — `supabase/schema.sql` 내용을 Supabase SQL Editor에서 실행
+1. **SQL 실행** — `supabase/schema.sql` 내용을 Supabase SQL Editor에서 실행 (`image_url` 컬럼 포함)
 2. **DB 마이그레이션** — `creator_email` → `creator_user_id` 컬럼 변경 (Task A SQL)
 3. **Realtime 활성화** — Database → Replication → `payments` 테이블 토글 ON
 4. **Auth 설정** — Authentication → Email Provider → "Enable Email Confirmations" 체크 (OTP 회원가입 인증용)
-5. **카카오 도메인 등록** — Kakao Developers → 앱 설정 → 플랫폼 → Web → `http://localhost:3000`
-6. **[추후] 카카오 OAuth** — Supabase → Authentication → Providers → Kakao → Client ID/Secret 등록
+5. **Storage 버킷 생성** — Supabase → Storage → New Bucket → `funding-images` (Public 체크)
+6. **카카오 도메인 등록** — Kakao Developers → 앱 설정 → 플랫폼 → Web → `http://localhost:3000`
+7. **[추후] 카카오 OAuth** — Supabase → Authentication → Providers → Kakao → Client ID/Secret 등록
 
 ---
 
@@ -203,9 +220,11 @@ moamoa/
 │   ├── create/
 │   │   ├── page.tsx                  # 펀딩 생성 (OTP 단계 제거)
 │   │   └── actions.ts
-│   ├── funding/[token]/
-│   │   ├── page.tsx                  # 공개 펀딩 페이지
-│   │   ├── FundingRealtime.tsx
+│   ├── funding/
+│   │   ├── page.tsx                  # 펀딩 피드 (카드 리스트)
+│   │   └── [token]/
+│   │       ├── page.tsx              # 개별 펀딩 현황 페이지
+│   │       ├── FundingRealtime.tsx
 │   │   ├── pay/
 │   │   │   ├── page.tsx
 │   │   │   ├── PayClient.tsx
@@ -221,7 +240,7 @@ moamoa/
 │   └── api/payment/confirm/route.ts
 ├── components/
 │   ├── ui/ (Button, Input, ProgressBar)
-│   ├── funding/ (FundingProgress, GiftList, DonorList)
+│   ├── funding/ (FundingCard, FundingProgress, GiftList, DonorRolling)
 │   └── payment/ (AmountSelector, KakaoShareModal)
 ├── lib/
 │   ├── utils.ts
