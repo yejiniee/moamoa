@@ -1,9 +1,17 @@
 interface Window {
   Kakao?: {
     isInitialized: () => boolean
-    init: (key?: string) => void
+    init: (key: string | undefined) => void
     Share?: {
-      sendDefault: (options: Record<string, unknown>) => void
+      sendDefault: (options: {
+        objectType: string
+        content: {
+          title: string
+          description: string
+          link: { mobileWebUrl: string; webUrl: string }
+        }
+        buttons: { title: string; link: { mobileWebUrl: string; webUrl: string } }[]
+      }) => void
     }
   }
 }
