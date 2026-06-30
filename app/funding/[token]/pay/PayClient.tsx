@@ -46,7 +46,7 @@ export default function PayClient({ fundingId, fundingTitle }: Props) {
   return (
     <main className="min-h-screen flex items-center justify-center px-4 bg-gray-50">
       <div className="w-full max-w-md bg-white rounded-2xl p-6 shadow-sm flex flex-col gap-5">
-        <h1 className="text-xl font-bold text-gray-900">선물하기 🎁</h1>
+        <h1 className="text-xl font-bold text-gray-900">마음을 전해보세요 🎁</h1>
 
         <AmountSelector value={amount} onChange={setAmount} />
 
@@ -71,7 +71,7 @@ export default function PayClient({ fundingId, fundingTitle }: Props) {
         {error && <p className="text-sm text-red-500">{error}</p>}
 
         <Button onClick={handlePay} disabled={isPending}>
-          {isPending ? '처리 중...' : '결제하기'}
+          {isPending ? '처리 중...' : '선물하기'}
         </Button>
       </div>
     </main>
