@@ -60,19 +60,53 @@ UI는 **Toss Design System (TDS)** 을 참고한다.
 
 ---
 
-### Phase 3 — 펀딩 생성
+### Phase 2.5 — 인증 (Auth) ← 신규 추가
 
-- [ ] **Task 5: 펀딩 생성 — OTP Server Actions**
+> **배경:** 펀딩 생성마다 OTP 인증 요구 → 이메일+비밀번호 회원가입/로그인으로 전환. 세션 유지로 재인증 불필요. 카카오 소셜 로그인은 추후 구현.
+
+- [ ] **Task A: DB 스키마 마이그레이션 & 타입 업데이트**
+  - `fundings.creator_email` → `fundings.creator_user_id uuid REFERENCES auth.users(id)` 변경
+  - RLS 정책 추가: `fundings` update → `auth.uid() = creator_user_id`
+  - Supabase 대시보드 SQL Editor에서 직접 실행
+  - `lib/supabase/types.ts` `Funding` 타입: `creator_email: string` → `creator_user_id: string`
+
+- [ ] **Task B: 미들웨어 (세션 보호)**
+  - `middleware.ts` — `/create`, `/funding/[token]/admin` 경로 세션 확인
+  - 세션 없으면 `/login?redirect=원래경로` 리다이렉트
+  - Supabase `@supabase/ssr` 쿠키 갱신 처리
+
+- [ ] **Task C: 회원가입 페이지**
+  - `app/register/page.tsx` — 이메일, 비밀번호, 비밀번호 확인 입력
+  - `app/register/actions.ts` — `signUp(email, password)`, `verifySignUpOtp(email, otp)`
+  - Step 1: 이메일 + 비밀번호 입력 → OTP 발송
+  - Step 2: OTP 코드 입력 → 계정 생성 + 자동 로그인 → /create 리다이렉트
+  - TDS 스타일 적용
+
+- [ ] **Task D: 로그인 페이지**
+  - `app/login/page.tsx` — 이메일 + 비밀번호 입력
+  - `app/login/actions.ts` — `signIn(email, password)`, `signOut()`
+  - 로그인 성공 → `redirect` 파라미터 경로 또는 `/create`
+  - 로그아웃 버튼 (헤더 또는 어드민 페이지 내)
+  - TDS 스타일 적용
+
+- [ ] **Task E: 카카오 소셜 로그인 (추후 구현 — 우선순위 낮음)**
+  - Supabase OAuth Provider: Kakao 설정
+  - `app/login/page.tsx`에 "카카오로 로그인" 버튼 추가
+  - 환경변수: Supabase 대시보드에서 Kakao Client ID/Secret 등록
+
+---
+
+### Phase 3 — 펀딩 생성 (수정)
+
+- [ ] **Task 5: 펀딩 생성 Server Action 수정**
   - `app/create/actions.ts`
-  - `sendOtp(email)` — Supabase Auth OTP 발송
-  - `verifyOtp(email, otp)` — OTP 검증
-  - `createFunding(data)` — fundings + gifts DB INSERT (service_role)
+  - `sendOtp` / `verifyOtp` 제거
+  - `createFunding(data)` — `creator_user_id = session.user.id` 사용 (creator_email 파라미터 제거)
 
-- [ ] **Task 6: 펀딩 생성 페이지 (3단계 UI)**
+- [ ] **Task 6: 펀딩 생성 페이지 수정 (1단계 UI)**
   - `app/create/page.tsx` — 클라이언트 컴포넌트
-  - Step 1: 이메일 입력 → OTP 발송
-  - Step 2: OTP 코드 입력 → 인증
-  - Step 3: 펀딩 제목 / 설명 / 마감일 / 선물 목록 입력
+  - Step 1~2 (이메일 OTP) 제거 → 바로 펀딩 정보 입력
+  - 펀딩 제목 / 설명 / 마감일 / 선물 목록 입력
   - 완료: 공유 링크 표시 + 복사 버튼
 
 ---
@@ -112,14 +146,14 @@ UI는 **Toss Design System (TDS)** 을 참고한다.
 
 ---
 
-### Phase 6 — 주최자 관리
+### Phase 6 — 주최자 관리 (수정)
 
 - [ ] **Task 12: 주최자 관리 페이지 & 정산**
-  - `app/funding/[token]/admin/page.tsx` — 클라이언트 컴포넌트 (OTP 재인증)
+  - `app/funding/[token]/admin/page.tsx` — Server Component (세션 기반 접근 제어)
   - `app/funding/[token]/admin/actions.ts`
-  - `sendAdminOtp(token, email)` — creator_email 일치 확인 후 OTP 발송
-  - `verifyAdminOtp(email, otp)` — OTP 검증
-  - `requestSettlement(token, email)` — fundings.status = 'closed' 업데이트
+  - OTP 재인증 제거 → 세션 `user.id === fundings.creator_user_id` 검증으로 대체
+  - `requestSettlement(token)` — fundings.status = 'closed' 업데이트
+  - 로그아웃 버튼 포함
 
 ---
 
@@ -144,9 +178,11 @@ UI는 **Toss Design System (TDS)** 을 참고한다.
 코드로 자동화할 수 없는 항목 (사용자가 직접):
 
 1. **SQL 실행** — `supabase/schema.sql` 내용을 Supabase SQL Editor에서 실행
-2. **Realtime 활성화** — Database → Replication → `payments` 테이블 토글 ON
-3. **Auth 설정** — Authentication → Email Provider → "Enable Email Confirmations" 체크 해제
-4. **카카오 도메인 등록** — Kakao Developers → 앱 설정 → 플랫폼 → Web → `http://localhost:3000`
+2. **DB 마이그레이션** — `creator_email` → `creator_user_id` 컬럼 변경 (Task A SQL)
+3. **Realtime 활성화** — Database → Replication → `payments` 테이블 토글 ON
+4. **Auth 설정** — Authentication → Email Provider → "Enable Email Confirmations" 체크 (OTP 회원가입 인증용)
+5. **카카오 도메인 등록** — Kakao Developers → 앱 설정 → 플랫폼 → Web → `http://localhost:3000`
+6. **[추후] 카카오 OAuth** — Supabase → Authentication → Providers → Kakao → Client ID/Secret 등록
 
 ---
 
@@ -154,11 +190,18 @@ UI는 **Toss Design System (TDS)** 을 참고한다.
 
 ```
 moamoa/
+├── middleware.ts                     # 세션 보호 (신규)
 ├── app/
 │   ├── layout.tsx
 │   ├── page.tsx                      # 랜딩
+│   ├── register/
+│   │   ├── page.tsx                  # 회원가입 (신규)
+│   │   └── actions.ts
+│   ├── login/
+│   │   ├── page.tsx                  # 로그인 (신규)
+│   │   └── actions.ts
 │   ├── create/
-│   │   ├── page.tsx                  # 펀딩 생성 3단계
+│   │   ├── page.tsx                  # 펀딩 생성 (OTP 단계 제거)
 │   │   └── actions.ts
 │   ├── funding/[token]/
 │   │   ├── page.tsx                  # 공개 펀딩 페이지
@@ -168,7 +211,7 @@ moamoa/
 │   │   │   ├── PayClient.tsx
 │   │   │   └── actions.ts
 │   │   └── admin/
-│   │       ├── page.tsx
+│   │       ├── page.tsx              # 세션 기반 접근 제어
 │   │       └── actions.ts
 │   ├── payment/
 │   │   ├── success/

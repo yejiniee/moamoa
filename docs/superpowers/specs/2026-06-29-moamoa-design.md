@@ -15,9 +15,10 @@
 ## 기술 스택
 
 - **Frontend/Backend:** Next.js 14 (App Router)
-- **DB/Auth/Realtime:** Supabase (PostgreSQL + Email OTP + Realtime)
+- **DB/Auth/Realtime:** Supabase (PostgreSQL + Email+Password Auth + Realtime)
 - **결제:** 토스페이먼츠 테스트 모드
 - **카카오 알림:** 카카오 공유 SDK (무료)
+- **카카오 소셜 로그인:** 추후 구현 (Supabase OAuth 지원)
 
 ---
 
@@ -33,9 +34,9 @@
    │    └── Client Components  → Supabase Realtime 구독, 결제 버튼
    │
    ├── Supabase
-   │    ├── PostgreSQL DB      → 펀딩/선물/결제 데이터
-   │    ├── Auth (Email OTP)   → 주최자 이메일 인증 (매직링크)
-   │    └── Realtime           → 결제 발생 시 펀딩 현황 자동 갱신
+   │    ├── PostgreSQL DB           → 펀딩/선물/결제 데이터
+   │    ├── Auth (Email+Password)   → 주최자 회원가입/로그인 (회원가입 시 OTP 1회)
+   │    └── Realtime                → 결제 발생 시 펀딩 현황 자동 갱신
    │
    └── 토스페이먼츠 (테스트 모드)
         ├── 결제창 호출        → 참여자 카드 결제
@@ -43,7 +44,7 @@
         └── 정산 API           → 주최자 계좌 입금 (테스트)
 ```
 
-**인증 전략:** 주최자만 이메일 OTP 인증. 참여자는 인증 없이 `share_token` 기반 공유 링크로 접근.
+**인증 전략:** 주최자는 이메일+비밀번호로 회원가입/로그인 (회원가입 시 이메일 OTP 1회 인증). 참여자는 인증 없이 `share_token` 기반 공유 링크로 접근. 카카오 소셜 로그인은 추후 추가 예정.
 
 ---
 
@@ -52,9 +53,9 @@
 ```sql
 -- 펀딩
 fundings
-  id            uuid PRIMARY KEY DEFAULT gen_random_uuid()
-  creator_email text NOT NULL
-  title         text NOT NULL        -- "지수 생일 선물 펀딩"
+  id               uuid PRIMARY KEY DEFAULT gen_random_uuid()
+  creator_user_id  uuid NOT NULL REFERENCES auth.users(id)  -- 이메일 대신 auth user ID
+  title            text NOT NULL        -- "지수 생일 선물 펀딩"
   description   text
   end_date      timestamptz NOT NULL
   share_token   text UNIQUE NOT NULL  -- 랜덤 8자, 공유 링크용
@@ -88,7 +89,10 @@ payments
 
 **전체 목표 금액:** `gifts.target_amount`의 합산. 각 선물의 달성률은 `payments` 건을 선물 단위로 나누지 않고, 전체 모인 금액 대비 각 선물 목표 금액으로 단순 표시 (참여자가 특정 선물을 지정하지 않으므로).
 
-**보안:** Supabase Row Level Security(RLS) 활성화. `payments` 테이블은 insert만 허용(anon), select는 같은 funding_id만. `fundings`/`gifts`는 read 허용, write는 service role만.
+**보안:** Supabase Row Level Security(RLS) 활성화.
+- `fundings`: anon select 허용, update는 `auth.uid() = creator_user_id`인 경우만
+- `gifts`: anon select 허용, insert/update는 service role만
+- `payments`: anon select/insert 허용, update는 service role만 (결제 검증 시 서버에서 처리)
 
 ---
 
@@ -97,10 +101,19 @@ payments
 ```
 /                              랜딩 페이지 ("펀딩 만들기" CTA)
 
-/create                        펀딩 생성 (주최자)
-  Step 1: 이메일 입력 → OTP 발송
-  Step 2: OTP 코드 입력 → 인증
-  Step 3: 펀딩 정보 입력
+/register                      회원가입 (주최자)
+  Step 1: 이메일, 비밀번호, 비밀번호 확인 입력
+  Step 2: 이메일로 OTP 발송 → 코드 입력 → 계정 생성 + 자동 로그인
+  완료: /create 리다이렉트
+
+/login                         로그인 (주최자)
+  - 이메일 + 비밀번호 입력
+  - [추후] 카카오로 로그인 버튼
+  - 로그인 성공 → /create (또는 원래 접근하려던 페이지)
+
+/create                        펀딩 생성 (주최자, 로그인 필요)
+  - 세션 없으면 /login?redirect=/create 로 리다이렉트
+  - 펀딩 정보 입력 (OTP 단계 없음)
           - 제목, 설명, 마감일
           - 선물 추가 (이름, 목표 금액, 설명) - 여러 개 가능
   완료: 공유 링크 표시 + 복사 버튼
@@ -127,7 +140,9 @@ payments
 /payment/fail                  결제 실패 (토스 리다이렉트)
 
 /funding/[token]/admin         주최자 관리 페이지
-  - 이메일 OTP 재인증 후 접근
+  - 세션 없으면 /login?redirect=... 리다이렉트
+  - user.id ≠ fundings.creator_user_id 이면 403 접근 차단
+  - OTP 재인증 없음 (세션으로 충분)
   - 결제 내역 목록
   - 총 모인 금액
   - "정산 요청" 버튼 → 토스페이먼츠 정산 API (테스트)
@@ -137,14 +152,31 @@ payments
 
 ## 핵심 플로우
 
+### 회원가입 / 로그인
+
+```
+[회원가입]
+이메일 + 비밀번호 입력
+  → Supabase signUp() 호출 → 이메일 OTP 발송
+  → OTP 코드 입력 → verifyOtp()
+  → 계정 생성 + 자동 로그인 (세션 쿠키 저장)
+  → /create 리다이렉트
+
+[로그인]
+이메일 + 비밀번호 입력
+  → Supabase signInWithPassword() 호출
+  → 세션 쿠키 저장
+  → redirect 파라미터 경로 또는 /create 이동
+```
+
 ### 펀딩 생성
 
 ```
-이메일 입력
-  → Supabase OTP 발송 (Server Action)
-  → OTP 인증 성공
-  → 펀딩 정보 + 선물 입력
-  → Server Action: fundings + gifts INSERT
+/create 접속
+  → 미들웨어: 세션 확인 → 없으면 /login?redirect=/create
+  → 펀딩 정보 + 선물 입력 (OTP 단계 없음)
+  → Server Action: fundings INSERT (creator_user_id = session.user.id)
+  → gifts INSERT
   → share_token 생성 (nanoid 8자)
   → 공유 링크 표시: /funding/[token]
 ```
@@ -173,9 +205,8 @@ payments
 
 ```
 /funding/[token]/admin 접속
-  → 이메일 OTP 재인증
-      - 입력한 이메일 == fundings.creator_email 일치 검증 필수
-      - 불일치 시 접근 차단
+  → 미들웨어: 세션 없으면 /login?redirect=... 리다이렉트
+  → Server Component: session.user.id ≠ fundings.creator_user_id → notFound()
   → 결제 내역 + 총액 확인
   → "정산 요청" 클릭
   → Server Action: 토스페이먼츠 정산 API 호출 (테스트 모드)
