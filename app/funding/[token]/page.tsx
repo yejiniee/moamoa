@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation'
+import Image from 'next/image'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import FundingRealtime from './FundingRealtime'
@@ -47,9 +48,24 @@ export default async function FundingPage({
   const isClosed = funding.status === 'closed'
 
   return (
-    <main className="max-w-md mx-auto px-4 py-8 space-y-6">
+    <main className="max-w-md mx-auto pb-10 space-y-6">
+      {/* 대표 이미지 */}
+      <div className="relative w-full aspect-video bg-gray-100">
+        {funding.image_url ? (
+          <Image
+            src={funding.image_url}
+            alt={funding.title}
+            fill
+            className="object-cover"
+            priority
+          />
+        ) : (
+          <div className="flex items-center justify-center h-full text-6xl">🎂</div>
+        )}
+      </div>
+
       {/* 헤더 */}
-      <div>
+      <div className="px-4">
         <div className="flex items-center justify-between mb-2">
           <span className="text-sm font-semibold text-rose-500">{dday}</span>
           <div className="flex items-center gap-2">
@@ -75,16 +91,18 @@ export default async function FundingPage({
       </div>
 
       {/* 달성률 / 선물 목록 / 후원자 롤링 — 실시간 구독 */}
-      <FundingRealtime
-        fundingId={funding.id}
-        gifts={gifts ?? []}
-        initialPayments={payments ?? []}
-        isOwner={isOwner}
-      />
+      <div className="px-4">
+        <FundingRealtime
+          fundingId={funding.id}
+          gifts={gifts ?? []}
+          initialPayments={payments ?? []}
+          isOwner={isOwner}
+        />
+      </div>
 
       {/* 선물하기 버튼 */}
       {!isClosed && (
-        <div className="pt-2">
+        <div className="px-4 pt-2">
           <Link href={`/funding/${params.token}/pay`}>
             <Button>선물하기 🎁</Button>
           </Link>
