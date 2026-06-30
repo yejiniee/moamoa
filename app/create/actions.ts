@@ -10,7 +10,7 @@ export async function createFunding(data: {
   description: string
   endDate: string
   gifts: GiftInput[]
-}) {
+}): Promise<{ shareToken: string } | { error: string }> {
   if (data.gifts.length === 0) return { error: '선물을 1개 이상 추가해주세요' }
 
   const serverClient = await createServerSupabaseClient()

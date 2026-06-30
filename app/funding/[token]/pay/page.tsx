@@ -12,5 +12,5 @@ export default async function PayPage({ params }: { params: { token: string } })
 
   if (!funding || funding.status === 'closed') notFound()
 
-  return <PayClient fundingId={funding.id} fundingTitle={funding.title} token={params.token} />
+  return <PayClient fundingId={funding.id} fundingTitle={funding.title} />
 }

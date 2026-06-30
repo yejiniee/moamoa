@@ -16,11 +16,18 @@ export async function POST(req: NextRequest) {
     .from('payments')
     .select('*')
     .eq('order_id', orderId)
-    .eq('status', 'pending')
     .single()
 
   if (findError || !payment) {
     return NextResponse.json({ error: '결제 정보를 찾을 수 없습니다' }, { status: 404 })
+  }
+
+  if (payment.status === 'confirmed') {
+    return NextResponse.json({ success: true })
+  }
+
+  if (payment.status === 'failed') {
+    return NextResponse.json({ error: '이미 실패한 결제입니다' }, { status: 400 })
   }
 
   if (payment.amount !== Number(amount)) {

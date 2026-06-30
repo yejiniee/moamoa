@@ -7,7 +7,7 @@ import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
 import { createPendingPayment } from './actions'
 
-type Props = { fundingId: string; fundingTitle: string; token: string }
+type Props = { fundingId: string; fundingTitle: string }
 
 export default function PayClient({ fundingId, fundingTitle }: Props) {
   const [isPending, startTransition] = useTransition()

@@ -41,7 +41,7 @@ export default function CreatePage() {
           description: g.description,
         })),
       })
-      if ('error' in result) return setError(result.error as string)
+      if ('error' in result) return setError(result.error)
       setShareToken(result.shareToken)
     })
   }
