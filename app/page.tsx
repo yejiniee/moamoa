@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import Button from '@/components/ui/Button'
+import { createServerSupabaseClient } from '@/lib/supabase/server'
 
 const features = [
   { emoji: '🔗', label: '링크 공유', desc: '카카오톡으로 간편 공유' },
@@ -7,7 +8,10 @@ const features = [
   { emoji: '🎁', label: '선물 전달', desc: '실시간 달성률 확인' },
 ]
 
-export default function LandingPage() {
+export default async function LandingPage() {
+  const supabase = await createServerSupabaseClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
   return (
     <main className="min-h-screen flex flex-col items-center justify-center px-5 py-12">
       <div className="w-full max-w-[390px] flex flex-col gap-10">
@@ -53,6 +57,14 @@ export default function LandingPage() {
           <Link href="/create" className="block">
             <Button size="xlarge">펀딩 만들기</Button>
           </Link>
+          {!user && (
+            <p className="text-center text-[13px] text-gray-400">
+              이미 계정이 있으신가요?{' '}
+              <Link href="/login" className="text-rose-500 font-semibold hover:underline">
+                로그인
+              </Link>
+            </p>
+          )}
           <p className="text-center text-[13px] text-gray-400">
             이미 링크가 있다면 공유된 링크로 접속하세요
           </p>
