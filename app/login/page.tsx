@@ -10,7 +10,7 @@ import { signIn } from './actions'
 export default function LoginPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const redirectTo = searchParams.get('redirect') || '/create'
+  const redirectTo = searchParams.get('redirect') || '/'
 
   const [isPending, startTransition] = useTransition()
   const [email, setEmail] = useState('')

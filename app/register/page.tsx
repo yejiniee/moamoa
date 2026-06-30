@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
-import { signUp, verifySignUpOtp } from './actions'
+import { sendSignUpOtp, verifyOtpAndSetPassword } from './actions'
 
 export default function RegisterPage() {
   const router = useRouter()
@@ -17,27 +17,27 @@ export default function RegisterPage() {
   const [otp, setOtp] = useState('')
   const [error, setError] = useState('')
 
-  const handleSignUp = () => {
+  const handleSendOtp = () => {
     if (!email) return setError('이메일을 입력해주세요')
     if (password.length < 6) return setError('비밀번호는 6자 이상이어야 해요')
     if (password !== passwordConfirm) return setError('비밀번호가 일치하지 않아요')
     setError('')
 
     startTransition(async () => {
-      const result = await signUp(email, password)
+      const result = await sendSignUpOtp(email)
       if ('error' in result) return setError(result.error)
       setStep(2)
     })
   }
 
-  const handleVerifyOtp = () => {
+  const handleVerify = () => {
     if (!otp) return setError('인증 코드를 입력해주세요')
     setError('')
 
     startTransition(async () => {
-      const result = await verifySignUpOtp(email, otp)
+      const result = await verifyOtpAndSetPassword(email, otp, password)
       if ('error' in result) return setError(result.error)
-      router.push('/create')
+      router.push('/login')
       router.refresh()
     })
   }
@@ -49,7 +49,7 @@ export default function RegisterPage() {
           <div className="text-4xl mb-2">🎂</div>
           <h1 className="text-2xl font-bold text-gray-900">회원가입</h1>
           <p className="text-sm text-gray-500 mt-1">
-            {step === 1 ? '이메일과 비밀번호를 입력해주세요' : `${email}로 전송된 인증 코드를 입력해주세요`}
+            {step === 1 ? '이메일과 비밀번호를 입력해주세요' : `${email}로 인증 코드를 보냈어요`}
           </p>
         </div>
 
@@ -83,7 +83,7 @@ export default function RegisterPage() {
               placeholder="비밀번호 재입력"
               error={error}
             />
-            <Button onClick={handleSignUp} disabled={isPending}>
+            <Button onClick={handleSendOtp} disabled={isPending}>
               {isPending ? '처리 중...' : '인증 코드 받기'}
             </Button>
           </>
@@ -99,7 +99,7 @@ export default function RegisterPage() {
               maxLength={6}
               error={error}
             />
-            <Button onClick={handleVerifyOtp} disabled={isPending}>
+            <Button onClick={handleVerify} disabled={isPending}>
               {isPending ? '확인 중...' : '가입 완료'}
             </Button>
             <button
