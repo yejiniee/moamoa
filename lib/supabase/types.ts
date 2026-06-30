@@ -15,6 +15,7 @@ export type Database = {
           creator_user_id: string
           title: string
           description: string | null
+          image_url: string | null
           end_date: string
           share_token: string
           status: FundingStatus
@@ -25,6 +26,7 @@ export type Database = {
           creator_user_id: string
           title: string
           description?: string | null
+          image_url?: string | null
           end_date: string
           share_token: string
           status?: FundingStatus
@@ -35,6 +37,7 @@ export type Database = {
           creator_user_id?: string
           title?: string
           description?: string | null
+          image_url?: string | null
           end_date?: string
           share_token?: string
           status?: FundingStatus

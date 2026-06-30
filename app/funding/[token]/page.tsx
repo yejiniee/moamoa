@@ -20,13 +20,14 @@ export default async function FundingPage({
 }) {
   const supabase = await createClient()
 
-  const { data: funding, error: fundingError } = await supabase
-    .from('fundings')
-    .select('*')
-    .eq('share_token', params.token)
-    .single()
+  const [{ data: funding }, { data: { user } }] = await Promise.all([
+    supabase.from('fundings').select('*').eq('share_token', params.token).single(),
+    supabase.auth.getUser(),
+  ])
 
   if (!funding) notFound()
+
+  const isOwner = !!user && user.id === funding.creator_user_id
 
   const [{ data: gifts }, { data: payments }] = await Promise.all([
     supabase
@@ -51,11 +52,21 @@ export default async function FundingPage({
       <div>
         <div className="flex items-center justify-between mb-2">
           <span className="text-sm font-semibold text-rose-500">{dday}</span>
-          {isClosed && (
-            <span className="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">
-              마감된 펀딩
-            </span>
-          )}
+          <div className="flex items-center gap-2">
+            {isClosed && (
+              <span className="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">
+                마감된 펀딩
+              </span>
+            )}
+            {isOwner && (
+              <Link
+                href={`/funding/${params.token}/admin`}
+                className="text-xs text-gray-500 hover:text-rose-500 bg-gray-100 hover:bg-rose-50 px-2 py-0.5 rounded-full transition-colors"
+              >
+                관리자 →
+              </Link>
+            )}
+          </div>
         </div>
         <h1 className="text-2xl font-bold text-gray-900">{funding.title}</h1>
         {funding.description && (
@@ -63,11 +74,12 @@ export default async function FundingPage({
         )}
       </div>
 
-      {/* 달성률 / 선물 목록 / 후원자 목록 — 실시간 구독 */}
+      {/* 달성률 / 선물 목록 / 후원자 롤링 — 실시간 구독 */}
       <FundingRealtime
         fundingId={funding.id}
         gifts={gifts ?? []}
         initialPayments={payments ?? []}
+        isOwner={isOwner}
       />
 
       {/* 선물하기 버튼 */}
