@@ -12,7 +12,7 @@ export type Database = {
       fundings: {
         Row: {
           id: string
-          creator_email: string
+          creator_user_id: string
           title: string
           description: string | null
           end_date: string
@@ -22,7 +22,7 @@ export type Database = {
         }
         Insert: {
           id?: string
-          creator_email: string
+          creator_user_id: string
           title: string
           description?: string | null
           end_date: string
@@ -32,7 +32,7 @@ export type Database = {
         }
         Update: {
           id?: string
-          creator_email?: string
+          creator_user_id?: string
           title?: string
           description?: string | null
           end_date?: string
