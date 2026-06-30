@@ -38,3 +38,5 @@ export function createServiceClient() {
     }
   )
 }
+
+export const createServerSupabaseClient = createClient
