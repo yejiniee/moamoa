@@ -60,7 +60,7 @@ export default function PayClient({ fundingId, fundingTitle }: Props) {
         <div className="flex flex-col gap-1">
           <label className="text-sm font-medium text-gray-700">응원 메시지 (선택)</label>
           <textarea
-            className="border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-rose-300 resize-none"
+            className="border border-gray-300 rounded-2xl px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-rose-300 resize-none"
             rows={3}
             value={message}
             onChange={(e) => setMessage(e.target.value)}

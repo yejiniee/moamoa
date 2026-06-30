@@ -14,7 +14,7 @@ export default function AmountSelector({ value, onChange }: Props) {
             key={a}
             type="button"
             onClick={() => onChange(a)}
-            className={`py-2 rounded-lg text-sm font-semibold border transition-colors ${
+            className={`py-2 rounded-2xl text-sm font-semibold border transition-colors ${
               value === a
                 ? 'bg-rose-500 text-white border-rose-500'
                 : 'border-gray-300 text-gray-700 hover:border-rose-300'
