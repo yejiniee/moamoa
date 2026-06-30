@@ -1,9 +1,7 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
-import FundingProgress from '@/components/funding/FundingProgress'
-import GiftList from '@/components/funding/GiftList'
-import DonorList from '@/components/funding/DonorList'
+import FundingRealtime from './FundingRealtime'
 import Button from '@/components/ui/Button'
 
 function calcDday(endDate: string): string {
@@ -44,12 +42,6 @@ export default async function FundingPage({
       .order('created_at', { ascending: false }),
   ])
 
-  const giftList = gifts ?? []
-  const paymentList = payments ?? []
-
-  const totalGoal = giftList.reduce((sum, g) => sum + g.target_amount, 0)
-  const totalRaised = paymentList.reduce((sum, p) => sum + p.amount, 0)
-
   const dday = calcDday(funding.end_date)
   const isClosed = funding.status === 'closed'
 
@@ -71,18 +63,12 @@ export default async function FundingPage({
         )}
       </div>
 
-      {/* 전체 달성률 */}
-      <FundingProgress totalRaised={totalRaised} totalGoal={totalGoal} />
-
-      {/* 선물 목록 */}
-      {giftList.length > 0 && (
-        <GiftList gifts={giftList} totalRaised={totalRaised} />
-      )}
-
-      {/* 후원자 목록 */}
-      {paymentList.length > 0 && (
-        <DonorList payments={paymentList} />
-      )}
+      {/* 달성률 / 선물 목록 / 후원자 목록 — 실시간 구독 */}
+      <FundingRealtime
+        fundingId={funding.id}
+        gifts={gifts ?? []}
+        initialPayments={payments ?? []}
+      />
 
       {/* 선물하기 버튼 */}
       {!isClosed && (

@@ -85,7 +85,7 @@ UI는 **Toss Design System (TDS)** 을 참고한다.
   - `components/funding/DonorList.tsx` — 후원자 목록
   - `app/funding/[token]/page.tsx` — Server Component (초기 데이터 fetch)
 
-- [ ] **Task 8: Realtime 실시간 업데이트**
+- [x] **Task 8: Realtime 실시간 업데이트**
   - `app/funding/[token]/FundingRealtime.tsx` — Client Component
   - Supabase Realtime `payments` 테이블 구독
   - 결제 완료 시 달성률 / 금액 / 후원자 목록 자동 갱신
