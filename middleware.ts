@@ -29,6 +29,7 @@ export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
   const isProtected =
     pathname.startsWith('/create') ||
+    pathname === '/funding' ||
     /^\/funding\/[^/]+\/admin/.test(pathname)
 
   if (isProtected && !user) {

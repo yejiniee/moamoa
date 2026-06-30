@@ -6,9 +6,12 @@ import Button from '@/components/ui/Button'
 export default async function FundingFeedPage() {
   const supabase = await createClient()
 
+  const { data: { user } } = await supabase.auth.getUser()
+
   const { data: fundings } = await supabase
     .from('fundings')
     .select('*')
+    .eq('creator_user_id', user?.id ?? '')
     .order('created_at', { ascending: false })
 
   // 각 펀딩의 총 모금액 + 목표 금액 조회
@@ -38,16 +41,16 @@ export default async function FundingFeedPage() {
   return (
     <main className="max-w-md mx-auto px-4 py-8">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-xl font-bold text-gray-900">🎂 모아모아 펀딩</h1>
+        <h1 className="text-xl font-bold text-gray-900">내 펀딩</h1>
         <Link href="/create">
-          <Button className="w-auto px-4 py-2 text-sm">새 펀딩</Button>
+          <Button fullWidth={false} size="medium">+ 새 펀딩</Button>
         </Link>
       </div>
 
       {list.length === 0 ? (
         <div className="text-center py-20 text-gray-400">
           <div className="text-4xl mb-3">🎁</div>
-          <p className="text-sm">아직 펀딩이 없어요</p>
+          <p className="text-sm">아직 만든 펀딩이 없어요</p>
           <Link href="/create" className="mt-4 inline-block text-sm text-rose-500 hover:underline">
             첫 펀딩 만들기 →
           </Link>

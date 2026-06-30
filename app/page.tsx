@@ -57,7 +57,11 @@ export default async function LandingPage() {
           <Link href="/create" className="block">
             <Button size="xlarge">펀딩 만들기</Button>
           </Link>
-          {!user && (
+          {user ? (
+            <Link href="/funding" className="block">
+              <Button size="xlarge" variant="weak">내 펀딩 보기</Button>
+            </Link>
+          ) : (
             <p className="text-center text-[13px] text-gray-400">
               이미 계정이 있으신가요?{' '}
               <Link href="/login" className="text-rose-500 font-semibold hover:underline">
