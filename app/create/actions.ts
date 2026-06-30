@@ -3,11 +3,36 @@
 import { createServerSupabaseClient, createServiceClient } from '@/lib/supabase/server'
 import { generateShareToken } from '@/lib/utils'
 
+export async function uploadFundingImage(formData: FormData): Promise<{ url: string } | { error: string }> {
+  const file = formData.get('file') as File | null
+  if (!file) return { error: '파일을 선택해주세요' }
+  if (!file.type.startsWith('image/')) return { error: '이미지 파일만 업로드 가능해요' }
+  if (file.size > 5 * 1024 * 1024) return { error: '파일 크기는 5MB 이하여야 해요' }
+
+  const serverClient = await createServerSupabaseClient()
+  const { data: { user } } = await serverClient.auth.getUser()
+  if (!user) return { error: '로그인이 필요합니다' }
+
+  const supabase = createServiceClient()
+  const ext = file.name.split('.').pop() ?? 'jpg'
+  const path = `${user.id}/${Date.now()}.${ext}`
+
+  const { error: uploadError } = await supabase.storage
+    .from('funding-images')
+    .upload(path, file, { contentType: file.type, upsert: false })
+
+  if (uploadError) return { error: uploadError.message }
+
+  const { data: { publicUrl } } = supabase.storage.from('funding-images').getPublicUrl(path)
+  return { url: publicUrl }
+}
+
 type GiftInput = { name: string; targetAmount: number; description: string }
 
 export async function createFunding(data: {
   title: string
   description: string
+  imageUrl: string | null
   endDate: string
   gifts: GiftInput[]
 }): Promise<{ shareToken: string } | { error: string }> {
@@ -26,6 +51,7 @@ export async function createFunding(data: {
       creator_user_id: user.id,
       title: data.title,
       description: data.description,
+      image_url: data.imageUrl,
       end_date: new Date(data.endDate).toISOString(),
       share_token: shareToken,
       status: 'active',

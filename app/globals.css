@@ -43,3 +43,13 @@ button,
 a {
   -webkit-tap-highlight-color: transparent;
 }
+
+/* 후원자 롤링 배너 애니메이션 */
+@keyframes scroll-x {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+.animate-scroll-x {
+  animation: scroll-x linear infinite;
+}

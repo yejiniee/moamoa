@@ -31,17 +31,17 @@ UI는 **Toss Design System (TDS)** 을 참고한다.
 
 ### Phase 1 — 프로젝트 기반
 
-- [ ] **Task 1: 프로젝트 설정 & 의존성 설치**
+- [x] **Task 1: 프로젝트 설정 & 의존성 설치**
   - `npx create-next-app@latest` (TypeScript, Tailwind, App Router)
   - 추가 패키지: `@supabase/supabase-js`, `@supabase/ssr`, `nanoid`, `@tosspayments/payment-sdk`
   - 테스트 환경: `vitest`, `@vitejs/plugin-react`
   - `.env.example` 작성
 
-- [ ] **Task 2: 데이터베이스 스키마 & TypeScript 타입**
+- [x] **Task 2: 데이터베이스 스키마 & TypeScript 타입**
   - `lib/supabase/types.ts` — `Funding`, `Gift`, `Payment`, `Database` 타입
   - `supabase/schema.sql` — 3개 테이블 + RLS 정책 (사용자가 Supabase에서 직접 실행)
 
-- [ ] **Task 3: 유틸리티 함수 & Supabase 클라이언트**
+- [x] **Task 3: 유틸리티 함수 & Supabase 클라이언트**
   - `lib/utils.ts` — `generateShareToken()`, `formatKRW()`, `calcPercent()`
   - `lib/utils.test.ts` — Vitest 유닛 테스트 (TDD)
   - `lib/supabase/client.ts` — 브라우저 클라이언트
@@ -51,7 +51,7 @@ UI는 **Toss Design System (TDS)** 을 참고한다.
 
 ### Phase 2 — UI & 랜딩
 
-- [ ] **Task 4: UI 공통 컴포넌트 & 랜딩 페이지**
+- [x] **Task 4: UI 공통 컴포넌트 & 랜딩 페이지**
   - `components/ui/Button.tsx`
   - `components/ui/Input.tsx`
   - `components/ui/ProgressBar.tsx`
@@ -64,25 +64,25 @@ UI는 **Toss Design System (TDS)** 을 참고한다.
 
 > **배경:** 펀딩 생성마다 OTP 인증 요구 → 이메일+비밀번호 회원가입/로그인으로 전환. 세션 유지로 재인증 불필요. 카카오 소셜 로그인은 추후 구현.
 
-- [ ] **Task A: DB 스키마 마이그레이션 & 타입 업데이트**
+- [x] **Task A: DB 스키마 마이그레이션 & 타입 업데이트**
   - `fundings.creator_email` → `fundings.creator_user_id uuid REFERENCES auth.users(id)` 변경
   - RLS 정책 추가: `fundings` update → `auth.uid() = creator_user_id`
   - Supabase 대시보드 SQL Editor에서 직접 실행
   - `lib/supabase/types.ts` `Funding` 타입: `creator_email: string` → `creator_user_id: string`
 
-- [ ] **Task B: 미들웨어 (세션 보호)**
+- [x] **Task B: 미들웨어 (세션 보호)**
   - `middleware.ts` — `/create`, `/funding/[token]/admin` 경로 세션 확인
   - 세션 없으면 `/login?redirect=원래경로` 리다이렉트
   - Supabase `@supabase/ssr` 쿠키 갱신 처리
 
-- [ ] **Task C: 회원가입 페이지**
+- [x] **Task C: 회원가입 페이지**
   - `app/register/page.tsx` — 이메일, 비밀번호, 비밀번호 확인 입력
   - `app/register/actions.ts` — `signUp(email, password)`, `verifySignUpOtp(email, otp)`
   - Step 1: 이메일 + 비밀번호 입력 → OTP 발송
   - Step 2: OTP 코드 입력 → 계정 생성 + 자동 로그인 → /create 리다이렉트
   - TDS 스타일 적용
 
-- [ ] **Task D: 로그인 페이지**
+- [x] **Task D: 로그인 페이지**
   - `app/login/page.tsx` — 이메일 + 비밀번호 입력
   - `app/login/actions.ts` — `signIn(email, password)`, `signOut()`
   - 로그인 성공 → `redirect` 파라미터 경로 또는 `/create`
@@ -98,14 +98,14 @@ UI는 **Toss Design System (TDS)** 을 참고한다.
 
 ### Phase 3 — 펀딩 생성 (수정)
 
-- [ ] **Task 5: 펀딩 생성 Server Action 수정**
+- [x] **Task 5: 펀딩 생성 Server Action 수정**
   - `app/create/actions.ts`
   - `sendOtp` / `verifyOtp` 제거
   - `createFunding(data)` — `creator_user_id = session.user.id` 사용 (creator_email 파라미터 제거)
   - `uploadFundingImage(file)` — Supabase Storage `funding-images` 버킷에 업로드 후 공개 URL 반환
   - DB 스키마: `fundings` 테이블에 `image_url text` 컬럼 추가
 
-- [ ] **Task 6: 펀딩 생성 페이지 수정 (1단계 UI)**
+- [x] **Task 6: 펀딩 생성 페이지 수정 (1단계 UI)**
   - `app/create/page.tsx` — 클라이언트 컴포넌트
   - Step 1~2 (이메일 OTP) 제거 → 바로 펀딩 정보 입력
   - 펀딩 제목 / 설명 / 마감일 / 선물 목록 입력
@@ -116,14 +116,14 @@ UI는 **Toss Design System (TDS)** 을 참고한다.
 
 ### Phase 4 — 펀딩 페이지
 
-- [ ] **Task 7: 펀딩 피드 페이지**
+- [x] **Task 7: 펀딩 피드 페이지**
   - `app/funding/page.tsx` — 전체 펀딩 목록을 개인 피드(카드 리스트) 형태로 표시
   - `components/funding/FundingCard.tsx` — 피드에서 사용하는 펀딩 카드
     - 대표 이미지 (`image_url`) 썸네일 표시 — 없으면 기본 플레이스홀더
     - 제목, 진행률, D-day 표시
   - 카드 클릭 → `/funding/[token]` 개별 펀딩 현황 페이지로 이동
 
-- [ ] **Task 8: 펀딩 현황 페이지 — 정적 표시**
+- [x] **Task 8: 펀딩 현황 페이지 — 정적 표시**
   - `app/funding/[token]/page.tsx` — Server Component (초기 데이터 fetch + 세션 확인)
     - `isOwner = session?.user?.id === funding.creator_user_id` 판별 후 props로 전달
   - `components/funding/FundingProgress.tsx` — 달성률 바 + 금액
@@ -135,7 +135,7 @@ UI는 **Toss Design System (TDS)** 을 참고한다.
     - CSS 애니메이션(`@keyframes scroll-x`)으로 가로 무한 롤링
     - 후원자가 없으면 숨김 처리
 
-- [ ] **Task 9: Realtime 실시간 업데이트**
+- [x] **Task 9: Realtime 실시간 업데이트**
   - `app/funding/[token]/FundingRealtime.tsx` — Client Component
   - Supabase Realtime `payments` 테이블 구독
   - 결제 완료 시 달성률 / 금액 / 롤링 후원자 목록 자동 갱신 (새 항목을 롤링 큐 맨 뒤에 추가)
@@ -144,19 +144,19 @@ UI는 **Toss Design System (TDS)** 을 참고한다.
 
 ### Phase 5 — 결제
 
-- [ ] **Task 10: 결제 입력 페이지 & createPendingPayment**
+- [x] **Task 10: 결제 입력 페이지 & createPendingPayment**
   - `components/payment/AmountSelector.tsx` — 빠른 선택(1만/2만/3만/5만) + 자유 입력
   - `app/funding/[token]/pay/page.tsx` — Server Component (funding_id 조회)
   - `app/funding/[token]/pay/PayClient.tsx` — Client Component (결제창 호출)
   - `app/funding/[token]/pay/actions.ts` — `createPendingPayment()`
 
-- [ ] **Task 11: 결제 확인 API Route & 성공/실패 페이지**
+- [x] **Task 11: 결제 확인 API Route & 성공/실패 페이지**
   - `app/api/payment/confirm/route.ts` — 토스페이먼츠 서버 검증 + DB 업데이트
   - `app/payment/success/page.tsx` — Server Component (orderId로 결제 조회)
   - `app/payment/success/SuccessClient.tsx` — `/api/payment/confirm` 호출 + 결과 표시
   - `app/payment/fail/page.tsx`
 
-- [ ] **Task 12: 카카오 공유**
+- [x] **Task 12: 카카오 공유**
   - `types/kakao.d.ts` — `window.Kakao` 전역 타입 선언
   - 결제 성공 후 "카카오톡으로 알리기" 팝업 (SuccessClient에 포함)
 
@@ -164,7 +164,7 @@ UI는 **Toss Design System (TDS)** 을 참고한다.
 
 ### Phase 6 — 주최자 관리 (수정)
 
-- [ ] **Task 13: 주최자 관리 페이지 & 정산**
+- [x] **Task 13: 주최자 관리 페이지 & 정산**
   - `app/funding/[token]/admin/page.tsx` — Server Component (세션 기반 접근 제어)
   - `app/funding/[token]/admin/actions.ts`
   - OTP 재인증 제거 → 세션 `user.id === fundings.creator_user_id` 검증으로 대체

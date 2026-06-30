@@ -1,10 +1,11 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useRef, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
-import { createFunding } from './actions'
+import { uploadFundingImage, createFunding } from './actions'
 
 type GiftInput = { name: string; targetAmount: string; description: string }
 
@@ -18,6 +19,33 @@ export default function CreatePage() {
   const [error, setError] = useState('')
   const [shareToken, setShareToken] = useState('')
 
+  // 이미지 업로드 상태
+  const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const [imageUrl, setImageUrl] = useState<string | null>(null)
+  const [imageUploading, setImageUploading] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    setImagePreview(URL.createObjectURL(file))
+    setImageUploading(true)
+    setError('')
+
+    const formData = new FormData()
+    formData.append('file', file)
+    const result = await uploadFundingImage(formData)
+    setImageUploading(false)
+
+    if ('error' in result) {
+      setError(result.error)
+      setImagePreview(null)
+    } else {
+      setImageUrl(result.url)
+    }
+  }
+
   const addGift = () => setGifts([...gifts, { name: '', targetAmount: '', description: '' }])
   const removeGift = (idx: number) => setGifts(gifts.filter((_, i) => i !== idx))
   const updateGift = (idx: number, field: keyof GiftInput, value: string) => {
@@ -28,12 +56,14 @@ export default function CreatePage() {
     if (!title) return setError('펀딩 제목을 입력해주세요')
     if (!endDate) return setError('마감일을 선택해주세요')
     if (gifts.some((g) => !g.name || !g.targetAmount)) return setError('선물 정보를 모두 입력해주세요')
+    if (imageUploading) return setError('이미지 업로드 중입니다. 잠시 기다려주세요')
     setError('')
 
     startTransition(async () => {
       const result = await createFunding({
         title,
         description,
+        imageUrl,
         endDate,
         gifts: gifts.map((g) => ({
           name: g.name,
@@ -72,6 +102,40 @@ export default function CreatePage() {
       <div className="w-full max-w-md">
         <h1 className="text-xl font-bold mb-6">펀딩 만들기 🎂</h1>
         <div className="flex flex-col gap-5">
+          {/* 대표 이미지 업로드 */}
+          <div className="flex flex-col gap-1">
+            <label className="text-sm font-medium text-gray-700">대표 이미지 (선택)</label>
+            <div
+              className="relative border-2 border-dashed border-gray-200 rounded-xl overflow-hidden cursor-pointer hover:border-rose-300 transition-colors"
+              style={{ height: 160 }}
+              onClick={() => fileInputRef.current?.click()}
+            >
+              {imagePreview ? (
+                <Image src={imagePreview} alt="미리보기" fill className="object-cover" />
+              ) : (
+                <div className="flex flex-col items-center justify-center h-full text-gray-400 gap-2">
+                  <span className="text-2xl">📷</span>
+                  <span className="text-xs">클릭해서 이미지 업로드</span>
+                </div>
+              )}
+              {imageUploading && (
+                <div className="absolute inset-0 bg-white/70 flex items-center justify-center">
+                  <span className="text-sm text-gray-500">업로드 중...</span>
+                </div>
+              )}
+            </div>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleImageChange}
+            />
+            {imageUrl && (
+              <p className="text-xs text-green-600">✓ 이미지 업로드 완료</p>
+            )}
+          </div>
+
           <Input
             label="펀딩 제목"
             value={title}
@@ -138,7 +202,7 @@ export default function CreatePage() {
           </div>
 
           {error && <p className="text-sm text-red-500">{error}</p>}
-          <Button onClick={handleCreateFunding} disabled={isPending}>
+          <Button onClick={handleCreateFunding} disabled={isPending || imageUploading}>
             {isPending ? '생성 중...' : '펀딩 만들기 🎂'}
           </Button>
         </div>
