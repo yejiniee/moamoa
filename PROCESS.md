@@ -79,7 +79,7 @@ UI는 **Toss Design System (TDS)** 을 참고한다.
 
 ### Phase 4 — 공개 펀딩 페이지
 
-- [ ] **Task 7: 공개 펀딩 페이지 — 정적 표시**
+- [x] **Task 7: 공개 펀딩 페이지 — 정적 표시**
   - `components/funding/FundingProgress.tsx` — 달성률 바 + 금액
   - `components/funding/GiftList.tsx` — 선물 목록 + 각 달성률
   - `components/funding/DonorList.tsx` — 후원자 목록

@@ -100,6 +100,16 @@ create policy "payments_update_service"
   using (auth.role() = 'service_role');
 
 -- ============================================================
+-- 롤 권한 (GRANT)
+-- RLS만으로는 부족 — 테이블 접근 자체를 허용해야 함
+-- ============================================================
+
+grant select on public.fundings  to anon, authenticated;
+grant select on public.gifts     to anon, authenticated;
+grant select on public.payments  to anon, authenticated;
+grant insert on public.payments  to anon, authenticated;
+
+-- ============================================================
 -- 인덱스
 -- ============================================================
 
