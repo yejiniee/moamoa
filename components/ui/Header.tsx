@@ -26,6 +26,14 @@ export default function Header({ backHref, right }: Props) {
             <ChevronLeft />
           </button>
         )}
+
+        <Link
+          href="/"
+          className="absolute left-1/2 -translate-x-1/2 text-sm font-bold text-rose-500 tracking-tight hover:text-rose-600 transition-colors"
+        >
+          🎂 모아모아
+        </Link>
+
         {right && <div className="flex items-center gap-2">{right}</div>}
       </div>
     </header>
