@@ -8,15 +8,13 @@ import Input from '@/components/ui/Input'
 import Header from '@/components/ui/Header'
 import { uploadFundingImage, createFunding } from './actions'
 
-type GiftInput = { name: string; targetAmount: string; description: string }
-
 export default function CreatePage() {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [endDate, setEndDate] = useState('')
-  const [gift, setGift] = useState<GiftInput>({ name: '', targetAmount: '', description: '' })
+  const [giftTargetAmount, setGiftTargetAmount] = useState('')
   const [error, setError] = useState('')
   const [shareToken, setShareToken] = useState('')
 
@@ -50,7 +48,7 @@ export default function CreatePage() {
   const handleCreateFunding = () => {
     if (!title) return setError('펀딩 제목을 입력해주세요')
     if (!endDate) return setError('마감일을 선택해주세요')
-    if (!gift.name || !gift.targetAmount) return setError('선물 정보를 모두 입력해주세요')
+    if (!giftTargetAmount) return setError('목표 금액을 입력해주세요')
     if (imageUploading) return setError('이미지 업로드 중입니다. 잠시 기다려주세요')
     setError('')
 
@@ -61,9 +59,9 @@ export default function CreatePage() {
         imageUrl,
         endDate,
         gifts: [{
-          name: gift.name,
-          targetAmount: parseInt(gift.targetAmount.replace(/,/g, ''), 10),
-          description: gift.description,
+          name: title,
+          targetAmount: parseInt(giftTargetAmount.replace(/,/g, ''), 10),
+          description: '',
         }],
       })
       if ('error' in result) return setError(result.error)
@@ -157,24 +155,12 @@ export default function CreatePage() {
           />
 
           <Input
-            label="선물 이름"
-            value={gift.name}
-            onChange={(e) => setGift({ ...gift, name: e.target.value })}
-            placeholder="에어팟 프로"
-          />
-          <Input
             label="목표 금액 (원)"
             type="number"
-            value={gift.targetAmount}
-            onChange={(e) => setGift({ ...gift, targetAmount: e.target.value })}
+            value={giftTargetAmount}
+            onChange={(e) => setGiftTargetAmount(e.target.value)}
             placeholder="350000"
             min={1000}
-          />
-          <Input
-            label="선물 설명 (선택)"
-            value={gift.description}
-            onChange={(e) => setGift({ ...gift, description: e.target.value })}
-            placeholder="2세대 에어팟 프로"
           />
 
           {error && <p className="text-sm text-red-500">{error}</p>}

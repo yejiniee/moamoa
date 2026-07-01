@@ -26,9 +26,7 @@ export default function EditClient({ token, funding, gift }: Props) {
   const [imagePreview, setImagePreview] = useState<string | null>(funding.image_url)
   const [imageUploading, setImageUploading] = useState(false)
 
-  const [giftName, setGiftName] = useState(gift.name)
   const [giftTargetAmount, setGiftTargetAmount] = useState(String(gift.target_amount))
-  const [giftDescription, setGiftDescription] = useState(gift.description ?? '')
 
   const [error, setError] = useState('')
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -54,7 +52,7 @@ export default function EditClient({ token, funding, gift }: Props) {
   const handleSave = () => {
     if (!title) return setError('펀딩 제목을 입력해주세요')
     if (!endDate) return setError('마감일을 선택해주세요')
-    if (!giftName || !giftTargetAmount) return setError('선물 정보를 모두 입력해주세요')
+    if (!giftTargetAmount) return setError('목표 금액을 입력해주세요')
     if (imageUploading) return setError('이미지 업로드 중입니다')
     setError('')
 
@@ -66,9 +64,9 @@ export default function EditClient({ token, funding, gift }: Props) {
         imageUrl,
         gift: {
           id: gift.id,
-          name: giftName,
+          name: title,
           targetAmount: parseInt(giftTargetAmount.replace(/,/g, ''), 10),
-          description: giftDescription,
+          description: '',
         },
       })
       if ('error' in result) return setError(result.error)
@@ -125,18 +123,12 @@ export default function EditClient({ token, funding, gift }: Props) {
             min={new Date().toISOString().split('T')[0]}
           />
 
-          <Input label="선물 이름" value={giftName} onChange={(e) => setGiftName(e.target.value)} />
           <Input
             label="목표 금액 (원)"
             type="number"
             value={giftTargetAmount}
             onChange={(e) => setGiftTargetAmount(e.target.value)}
             min={1000}
-          />
-          <Input
-            label="선물 설명 (선택)"
-            value={giftDescription}
-            onChange={(e) => setGiftDescription(e.target.value)}
           />
 
           {error && <p className="text-sm text-red-500">{error}</p>}
