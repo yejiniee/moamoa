@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import FundingProgress from '@/components/funding/FundingProgress'
-import GiftList from '@/components/funding/GiftList'
 import DonorRolling from '@/components/funding/DonorRolling'
 import type { Gift, Payment } from '@/lib/supabase/types'
 
@@ -62,7 +61,6 @@ export default function FundingRealtime({ fundingId, gifts, initialPayments, isO
   return (
     <>
       <FundingProgress totalRaised={totalRaised} totalGoal={totalGoal} />
-      {gifts.length > 0 && <GiftList gifts={gifts} totalRaised={totalRaised} />}
       <DonorRolling payments={payments} isOwner={isOwner} />
     </>
   )

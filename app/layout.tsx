@@ -14,8 +14,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ko">
-      <body className="min-h-screen antialiased">
-        {children}
+      <body className="min-h-screen antialiased sm:bg-[#f2f3f5]">
+        <div className="min-h-screen w-full bg-[var(--color-bg)] sm:max-w-[430px] sm:mx-auto">
+          {children}
+        </div>
         <KakaoInit />
       </body>
     </html>

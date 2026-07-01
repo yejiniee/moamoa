@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation'
 import { createServiceClient } from '@/lib/supabase/server'
 import SuccessClient from './SuccessClient'
+import Header from '@/components/ui/Header'
 
 type SearchParams = { paymentKey?: string; orderId?: string; amount?: string }
 
@@ -41,8 +42,10 @@ export default async function SuccessPage({ searchParams }: { searchParams: Sear
   const totalTarget = (gifts ?? []).reduce((s, g) => s + g.target_amount, 0)
 
   return (
-    <main className="min-h-screen flex items-center justify-center px-4 bg-gray-50">
-      <div className="w-full max-w-md bg-white rounded-2xl p-8 shadow-sm">
+    <>
+      <Header />
+      <main className="min-h-[calc(100vh-3.5rem)] flex items-center justify-center px-4">
+      <div className="w-full max-w-md">
         <SuccessClient
           paymentKey={paymentKey}
           orderId={orderId}
@@ -54,6 +57,7 @@ export default async function SuccessPage({ searchParams }: { searchParams: Sear
           totalTarget={totalTarget}
         />
       </div>
-    </main>
+      </main>
+    </>
   )
 }

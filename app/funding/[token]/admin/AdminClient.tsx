@@ -3,6 +3,7 @@
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import Button from '@/components/ui/Button'
+import Header from '@/components/ui/Header'
 import { formatKRW } from '@/lib/utils'
 import { requestSettlement } from './actions'
 import type { Funding, Payment } from '@/lib/supabase/types'
@@ -37,10 +38,9 @@ export default function AdminClient({ funding, payments, totalAmount }: Props) {
   }
 
   return (
-    <main className="min-h-screen bg-gray-50 pb-10">
-      <div className="max-w-md mx-auto px-4 pt-8 flex flex-col gap-5">
-        <div className="flex justify-between items-center">
-          <h1 className="text-xl font-bold text-gray-900">관리자 페이지</h1>
+    <>
+      <Header
+        right={
           <button
             className="text-sm text-gray-400 hover:underline"
             onClick={handleSignOut}
@@ -48,7 +48,9 @@ export default function AdminClient({ funding, payments, totalAmount }: Props) {
           >
             로그아웃
           </button>
-        </div>
+        }
+      />
+      <main className="px-4 py-6 flex flex-col gap-5 pb-10">
 
         <div>
           <p className="text-lg font-semibold text-gray-700">{funding.title}</p>
@@ -98,7 +100,7 @@ export default function AdminClient({ funding, payments, totalAmount }: Props) {
             {isPending ? '정산 중...' : '정산 요청하기'}
           </Button>
         )}
-      </div>
-    </main>
+      </main>
+    </>
   )
 }

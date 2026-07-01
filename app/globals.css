@@ -6,7 +6,7 @@
 
 :root {
   /* TDS Color Tokens (rose primary) */
-  --color-bg: #f2f3f5;
+  --color-bg: #ffffff;
   --color-surface: #ffffff;
   --color-text-primary: #191f28;
   --color-text-secondary: #6b7280;
@@ -46,8 +46,12 @@ a {
 
 /* 후원자 롤링 배너 애니메이션 */
 @keyframes scroll-x {
-  from { transform: translateX(0); }
-  to { transform: translateX(-50%); }
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
 }
 
 .animate-scroll-x {
