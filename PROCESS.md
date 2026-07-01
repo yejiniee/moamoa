@@ -132,7 +132,7 @@ UI는 **Toss Design System (TDS)** 을 참고한다.
     - `isOwner: boolean` prop 수신
     - **일반 방문자**: `홍*동  "응원합니다!"` (이름 가운데 글자 마스킹)
     - **주최자**: `홍길동  "응원합니다!"` (풀네임 노출)
-    - CSS 애니메이션(`@keyframes scroll-x`)으로 가로 무한 롤링
+    - CSS 애니메이션(`@keyframes scroll-x`)으로 세로 무한 롤링
     - 후원자가 없으면 숨김 처리
   - **하단 CTA 버튼 — `isOwner` 기준 분기**
     - **방문자**: "선물하기" → `/funding/[token]/pay` 이동
