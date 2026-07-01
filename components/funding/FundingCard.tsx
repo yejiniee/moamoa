@@ -24,7 +24,7 @@ export default function FundingCard({ funding, totalRaised, totalTarget }: Props
 
   return (
     <Link href={`/funding/${funding.share_token}`} className="block">
-      <div className="bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+      <div className={`bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-md transition-shadow ${isClosed ? 'opacity-50 grayscale' : ''}`}>
         <div className="relative h-40 bg-gray-100">
           {funding.image_url ? (
             <Image src={funding.image_url} alt={funding.title} fill className="object-cover" />
@@ -37,7 +37,7 @@ export default function FundingCard({ funding, totalRaised, totalTarget }: Props
                 ? 'bg-gray-200 text-gray-500'
                 : 'bg-rose-100 text-rose-600'
             }`}>
-              {dday}
+              {isClosed ? '종료' : dday}
             </span>
           </div>
         </div>
