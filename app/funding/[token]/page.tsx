@@ -72,11 +72,6 @@ export default async function FundingPage({
         backHref="/funding"
         right={
           <>
-            {isClosed && (
-              <span className="text-xs text-gray-400 bg-gray-100 px-2.5 py-1 rounded-full">
-                마감
-              </span>
-            )}
             {isOwner && (
               <Link
                 href={`/funding/${params.token}/admin`}
@@ -124,7 +119,13 @@ export default async function FundingPage({
               />
             ) : (
               <div className="flex items-center justify-center h-full bg-gray-100">
-                <Image src="/images/ic-birthday-cake.svg" alt="기본 이미지" width={120} height={120} style={{ filter: 'brightness(0) invert(78%)' }} />
+                <Image
+                  src="/images/ic-birthday-cake.svg"
+                  alt="기본 이미지"
+                  width={120}
+                  height={120}
+                  style={{ filter: "brightness(0) invert(78%)" }}
+                />
               </div>
             )}
           </div>
