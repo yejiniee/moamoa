@@ -6,15 +6,15 @@
 
 ## 기술 스택
 
-| 항목 | 내용 |
-|------|------|
-| Frontend | Next.js 14 (App Router) |
-| DB / Auth / Realtime | Supabase |
-| 결제 | 토스페이먼츠 (테스트 모드) |
-| 카카오 알림 | 카카오 공유 SDK |
-| 스타일 | Tailwind CSS |
-| 언어 | TypeScript |
-| 테스트 | Vitest |
+| 항목                 | 내용                       |
+| -------------------- | -------------------------- |
+| Frontend             | Next.js 14 (App Router)    |
+| DB / Auth / Realtime | Supabase                   |
+| 결제                 | 토스페이먼츠 (테스트 모드) |
+| 카카오 알림          | 카카오 공유 SDK            |
+| 스타일               | Tailwind CSS               |
+| 언어                 | TypeScript                 |
+| 테스트               | Vitest                     |
 
 ## 디자인 시스템
 
@@ -207,13 +207,13 @@ UI는 **Toss Design System (TDS)** 을 참고한다.
 > 선물하기 기능 없음 — 수정·삭제 중심의 관리 UI.
 
 - [x] **Task 14: 나의 펀딩 목록 페이지**
-  - `app/my-funding/page.tsx` — Server Component (미들웨어 세션 보호)
+  - `app/funding/page.tsx` — Server Component (미들웨어 세션 보호)
   - `creator_user_id = session.user.id` 조건으로 본인 펀딩만 조회
   - `components/funding/MyFundingCard.tsx` — 나의 펀딩 전용 카드
     - 제목, 진행률, D-day, 상태(진행중/마감) 표시
     - **관리 버튼** → `/funding/[token]/admin` 이동
     - ~~선물하기 버튼 없음~~ (일반 방문자 뷰와 구분)
-  - 미들웨어(`middleware.ts`)에 `/my-funding` 경로 보호 추가
+  - 미들웨어(`middleware.ts`)에 `/funding` 경로 보호 추가
 
 - [x] **Task 15: 펀딩 수정 페이지**
   - 진입: 관리 페이지(`/funding/[token]/admin`)의 수정 버튼
@@ -232,7 +232,7 @@ UI는 **Toss Design System (TDS)** 을 참고한다.
     - `deleteFunding(token)` — `creator_user_id` 검증
     - `payments`, `gifts` 연관 데이터 cascade 삭제 (DB 레벨 ON DELETE CASCADE)
     - Supabase Storage `funding-images` 이미지 파일 삭제
-    - 삭제 완료 → `/my-funding` 리다이렉트
+    - 삭제 완료 → `/funding` 리다이렉트
 
 ---
 
@@ -240,15 +240,15 @@ UI는 **Toss Design System (TDS)** 을 참고한다.
 
 `.env.local`에 모두 입력 필요:
 
-| 변수 | 출처 |
-|------|------|
-| `NEXT_PUBLIC_SUPABASE_URL` | Supabase → Settings → API |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase → Settings → API |
-| `SUPABASE_SERVICE_ROLE_KEY` | Supabase → Settings → API |
-| `NEXT_PUBLIC_TOSS_CLIENT_KEY` | 토스페이먼츠 개발자센터 (test_ck_...) |
-| `TOSS_SECRET_KEY` | 토스페이먼츠 개발자센터 (test_sk_...) |
-| `NEXT_PUBLIC_KAKAO_JS_KEY` | 카카오 developers.kakao.com |
-| `NEXT_PUBLIC_BASE_URL` | `http://localhost:3000` |
+| 변수                            | 출처                                  |
+| ------------------------------- | ------------------------------------- |
+| `NEXT_PUBLIC_SUPABASE_URL`      | Supabase → Settings → API             |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase → Settings → API             |
+| `SUPABASE_SERVICE_ROLE_KEY`     | Supabase → Settings → API             |
+| `NEXT_PUBLIC_TOSS_CLIENT_KEY`   | 토스페이먼츠 개발자센터 (test*ck*...) |
+| `TOSS_SECRET_KEY`               | 토스페이먼츠 개발자센터 (test*sk*...) |
+| `NEXT_PUBLIC_KAKAO_JS_KEY`      | 카카오 developers.kakao.com           |
+| `NEXT_PUBLIC_BASE_URL`          | `http://localhost:3000`               |
 
 ---
 
@@ -270,7 +270,7 @@ UI는 **Toss Design System (TDS)** 을 참고한다.
 
 ```
 moamoa/
-├── middleware.ts                     # 세션 보호 (/create, /my-funding, /funding/[token]/admin·edit)
+├── middleware.ts                     # 세션 보호 (/create, /funding, /funding/[token]/admin·edit)
 ├── app/
 │   ├── layout.tsx
 │   ├── page.tsx                      # 랜딩
@@ -283,8 +283,6 @@ moamoa/
 │   ├── create/
 │   │   ├── page.tsx                  # 펀딩 생성
 │   │   └── actions.ts
-│   ├── my-funding/
-│   │   └── page.tsx                  # 나의 펀딩 목록 (관리 버튼 → admin 이동)
 │   ├── funding/
 │   │   ├── page.tsx                  # 펀딩 피드 (카드 리스트)
 │   │   └── [token]/
