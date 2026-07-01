@@ -180,23 +180,23 @@ UI는 **Toss Design System (TDS)** 을 참고한다.
     - 확인 클릭 → `requestSettlement(token)` — `fundings.status = 'closed'`, `settled_at = now()` 업데이트
     - 마감된 펀딩은 정산하기 버튼 비활성화(이미 정산됨 표시)
 
-- [ ] **Task 17: 자동 정산 프로세스**
+- [~] **Task 17: 자동 정산 프로세스**
 
   **DB 변경**
   - `fundings` 테이블에 `settled_at timestamptz` 컬럼 추가
 
-  **트리거 1 — 마감기한 도달 시 자동 정산**
+  **트리거 1 — 마감기한 도달 시 자동 정산** ← 미구현
   - Supabase Edge Function (`supabase/functions/auto-settle/index.ts`) + cron (매일 자정)
   - `status = 'active'` AND `deadline < now()` 인 펀딩 일괄 조회
   - `status = 'closed'`, `settled_at = now()` 업데이트
 
-  **트리거 2 — 목표금액 달성 시 자동 정산**
+  **트리거 2 — 목표금액 달성 시 자동 정산** ← ✅ 완료
   - `app/api/payment/confirm/route.ts` 결제 확인 후 즉시 체크
   - 결제 완료 후 해당 펀딩의 총 후원금 합산 → `target_amount` 이상이면
-  - `status = 'closed'`, `settled_at = now()` 업데이트
+  - `status = 'closed'` 업데이트
 
-  **정산 후 공통 처리**
-  - 마감된 펀딩 현황 페이지: "이 펀딩은 정산이 완료되었습니다" 배너 표시
+  **정산 후 공통 처리** ← ✅ 완료
+  - 마감된 펀딩 현황 페이지: 종료 뱃지 + "마감된 펀딩이에요" 표시
   - 방문자 "선물하기" 버튼 비활성화 (status = 'closed' 기준)
 
 ---
@@ -206,7 +206,7 @@ UI는 **Toss Design System (TDS)** 을 참고한다.
 > **방향:** 로그인한 사용자가 본인이 만든 펀딩을 한눈에 보고 관리하는 페이지.
 > 선물하기 기능 없음 — 수정·삭제 중심의 관리 UI.
 
-- [ ] **Task 14: 나의 펀딩 목록 페이지**
+- [x] **Task 14: 나의 펀딩 목록 페이지**
   - `app/my-funding/page.tsx` — Server Component (미들웨어 세션 보호)
   - `creator_user_id = session.user.id` 조건으로 본인 펀딩만 조회
   - `components/funding/MyFundingCard.tsx` — 나의 펀딩 전용 카드
@@ -215,7 +215,7 @@ UI는 **Toss Design System (TDS)** 을 참고한다.
     - ~~선물하기 버튼 없음~~ (일반 방문자 뷰와 구분)
   - 미들웨어(`middleware.ts`)에 `/my-funding` 경로 보호 추가
 
-- [ ] **Task 15: 펀딩 수정 페이지**
+- [x] **Task 15: 펀딩 수정 페이지**
   - 진입: 관리 페이지(`/funding/[token]/admin`)의 수정 버튼
   - `app/funding/[token]/edit/page.tsx` — Server Component (소유자 검증, 비소유자 리다이렉트)
   - `app/funding/[token]/edit/EditClient.tsx` — Client Component
@@ -225,7 +225,7 @@ UI는 **Toss Design System (TDS)** 을 참고한다.
   - `app/funding/[token]/edit/actions.ts`
     - `updateFunding(token, data)` — `creator_user_id` 검증 후 `fundings` 업데이트
 
-- [ ] **Task 16: 펀딩 삭제**
+- [x] **Task 16: 펀딩 삭제**
   - 진입: 관리 페이지(`/funding/[token]/admin`)의 삭제 버튼
   - `components/funding/DeleteModal.tsx` — 삭제 확인 모달 ("정말 삭제하시겠어요?" + 취소/삭제 버튼)
   - `app/funding/[token]/delete/actions.ts`
