@@ -13,6 +13,7 @@ export default async function FundingFeedPage() {
     .from('fundings')
     .select('*')
     .eq('creator_user_id', user?.id ?? '')
+    .order('status', { ascending: true })
     .order('created_at', { ascending: false })
 
   // 각 펀딩의 총 모금액 + 목표 금액 조회
