@@ -136,7 +136,7 @@ export default function CreatePage() {
             placeholder="지수 생일 선물 펀딩 🎂"
           />
           <div className="flex flex-col gap-1">
-            <label className="text-sm font-medium text-gray-700">설명 <span className="text-gray-400 font-normal">(선택)</span></label>
+            <label className="text-sm font-medium text-gray-700">설명</label>
             <textarea
               className="border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-rose-300 resize-none"
               rows={3}
