@@ -134,6 +134,9 @@ UI는 **Toss Design System (TDS)** 을 참고한다.
     - **주최자**: `홍길동  "응원합니다!"` (풀네임 노출)
     - CSS 애니메이션(`@keyframes scroll-x`)으로 가로 무한 롤링
     - 후원자가 없으면 숨김 처리
+  - **하단 CTA 버튼 — `isOwner` 기준 분기**
+    - **방문자**: "선물하기" → `/funding/[token]/pay` 이동
+    - **주최자**: "관리" 버튼(수정/삭제 → `/funding/[token]/admin`) + "정산하기" 버튼(정산 모달 — Task 13)
 
 - [x] **Task 9: Realtime 실시간 업데이트**
   - `app/funding/[token]/FundingRealtime.tsx` — Client Component
@@ -168,8 +171,68 @@ UI는 **Toss Design System (TDS)** 을 참고한다.
   - `app/funding/[token]/admin/page.tsx` — Server Component (세션 기반 접근 제어)
   - `app/funding/[token]/admin/actions.ts`
   - OTP 재인증 제거 → 세션 `user.id === fundings.creator_user_id` 검증으로 대체
-  - `requestSettlement(token)` — fundings.status = 'closed' 업데이트
   - 로그아웃 버튼 포함
+  - **수정 버튼** → `/funding/[token]/edit` 이동 (Task 15)
+  - **삭제 버튼** → `DeleteModal` 표시 → `deleteFunding()` 호출 (Task 16)
+  - **정산하기 버튼** (펀딩 현황 페이지에서 진입) → 정산 확인 모달 표시
+    - 목표금액 달성 시: "🎉 목표금액을 달성했어요! 지금 정산을 진행할까요?"
+    - 목표금액 미달성 시: "아직 목표금액에 도달하지 못했어요. 그래도 정산을 진행할까요?"
+    - 확인 클릭 → `requestSettlement(token)` — `fundings.status = 'closed'`, `settled_at = now()` 업데이트
+    - 마감된 펀딩은 정산하기 버튼 비활성화(이미 정산됨 표시)
+
+- [ ] **Task 17: 자동 정산 프로세스**
+
+  **DB 변경**
+  - `fundings` 테이블에 `settled_at timestamptz` 컬럼 추가
+
+  **트리거 1 — 마감기한 도달 시 자동 정산**
+  - Supabase Edge Function (`supabase/functions/auto-settle/index.ts`) + cron (매일 자정)
+  - `status = 'active'` AND `deadline < now()` 인 펀딩 일괄 조회
+  - `status = 'closed'`, `settled_at = now()` 업데이트
+
+  **트리거 2 — 목표금액 달성 시 자동 정산**
+  - `app/api/payment/confirm/route.ts` 결제 확인 후 즉시 체크
+  - 결제 완료 후 해당 펀딩의 총 후원금 합산 → `target_amount` 이상이면
+  - `status = 'closed'`, `settled_at = now()` 업데이트
+
+  **정산 후 공통 처리**
+  - 마감된 펀딩 현황 페이지: "이 펀딩은 정산이 완료되었습니다" 배너 표시
+  - 방문자 "선물하기" 버튼 비활성화 (status = 'closed' 기준)
+
+---
+
+### Phase 7 — 나의 펀딩
+
+> **방향:** 로그인한 사용자가 본인이 만든 펀딩을 한눈에 보고 관리하는 페이지.
+> 선물하기 기능 없음 — 수정·삭제 중심의 관리 UI.
+
+- [ ] **Task 14: 나의 펀딩 목록 페이지**
+  - `app/my-funding/page.tsx` — Server Component (미들웨어 세션 보호)
+  - `creator_user_id = session.user.id` 조건으로 본인 펀딩만 조회
+  - `components/funding/MyFundingCard.tsx` — 나의 펀딩 전용 카드
+    - 제목, 진행률, D-day, 상태(진행중/마감) 표시
+    - **관리 버튼** → `/funding/[token]/admin` 이동
+    - ~~선물하기 버튼 없음~~ (일반 방문자 뷰와 구분)
+  - 미들웨어(`middleware.ts`)에 `/my-funding` 경로 보호 추가
+
+- [ ] **Task 15: 펀딩 수정 페이지**
+  - 진입: 관리 페이지(`/funding/[token]/admin`)의 수정 버튼
+  - `app/funding/[token]/edit/page.tsx` — Server Component (소유자 검증, 비소유자 리다이렉트)
+  - `app/funding/[token]/edit/EditClient.tsx` — Client Component
+    - 기존 펀딩 데이터 pre-fill (제목, 설명, 마감일, 선물 목록, 대표 이미지)
+    - 이미지 교체 시 기존 Storage 파일 삭제 후 재업로드
+    - 저장 완료 → `/funding/[token]/admin` 리다이렉트
+  - `app/funding/[token]/edit/actions.ts`
+    - `updateFunding(token, data)` — `creator_user_id` 검증 후 `fundings` 업데이트
+
+- [ ] **Task 16: 펀딩 삭제**
+  - 진입: 관리 페이지(`/funding/[token]/admin`)의 삭제 버튼
+  - `components/funding/DeleteModal.tsx` — 삭제 확인 모달 ("정말 삭제하시겠어요?" + 취소/삭제 버튼)
+  - `app/funding/[token]/delete/actions.ts`
+    - `deleteFunding(token)` — `creator_user_id` 검증
+    - `payments`, `gifts` 연관 데이터 cascade 삭제 (DB 레벨 ON DELETE CASCADE)
+    - Supabase Storage `funding-images` 이미지 파일 삭제
+    - 삭제 완료 → `/my-funding` 리다이렉트
 
 ---
 
@@ -207,31 +270,39 @@ UI는 **Toss Design System (TDS)** 을 참고한다.
 
 ```
 moamoa/
-├── middleware.ts                     # 세션 보호 (신규)
+├── middleware.ts                     # 세션 보호 (/create, /my-funding, /funding/[token]/admin·edit)
 ├── app/
 │   ├── layout.tsx
 │   ├── page.tsx                      # 랜딩
 │   ├── register/
-│   │   ├── page.tsx                  # 회원가입 (신규)
+│   │   ├── page.tsx                  # 회원가입
 │   │   └── actions.ts
 │   ├── login/
-│   │   ├── page.tsx                  # 로그인 (신규)
+│   │   ├── page.tsx                  # 로그인
 │   │   └── actions.ts
 │   ├── create/
-│   │   ├── page.tsx                  # 펀딩 생성 (OTP 단계 제거)
+│   │   ├── page.tsx                  # 펀딩 생성
 │   │   └── actions.ts
+│   ├── my-funding/
+│   │   └── page.tsx                  # 나의 펀딩 목록 (관리 버튼 → admin 이동)
 │   ├── funding/
 │   │   ├── page.tsx                  # 펀딩 피드 (카드 리스트)
 │   │   └── [token]/
 │   │       ├── page.tsx              # 개별 펀딩 현황 페이지
 │   │       ├── FundingRealtime.tsx
-│   │   ├── pay/
-│   │   │   ├── page.tsx
-│   │   │   ├── PayClient.tsx
-│   │   │   └── actions.ts
-│   │   └── admin/
-│   │       ├── page.tsx              # 세션 기반 접근 제어
-│   │       └── actions.ts
+│   │       ├── edit/
+│   │       │   ├── page.tsx          # 펀딩 수정 (소유자 전용)
+│   │       │   ├── EditClient.tsx
+│   │       │   └── actions.ts
+│   │       ├── delete/
+│   │       │   └── actions.ts        # 펀딩 삭제 Server Action
+│   │       ├── pay/
+│   │       │   ├── page.tsx
+│   │       │   ├── PayClient.tsx
+│   │       │   └── actions.ts
+│   │       └── admin/
+│   │           ├── page.tsx          # 세션 기반 접근 제어
+│   │           └── actions.ts
 │   ├── payment/
 │   │   ├── success/
 │   │   │   ├── page.tsx
@@ -240,7 +311,7 @@ moamoa/
 │   └── api/payment/confirm/route.ts
 ├── components/
 │   ├── ui/ (Button, Input, ProgressBar)
-│   ├── funding/ (FundingCard, FundingProgress, GiftList, DonorRolling)
+│   ├── funding/ (FundingCard, MyFundingCard, FundingProgress, GiftList, DonorRolling, DeleteModal)
 │   └── payment/ (AmountSelector, KakaoShareModal)
 ├── lib/
 │   ├── utils.ts
