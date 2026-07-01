@@ -1,60 +1,64 @@
-'use client'
+"use client";
 
-import { useRef, useState, useTransition } from 'react'
-import { useRouter } from 'next/navigation'
-import Image from 'next/image'
-import Input from '@/components/ui/Input'
-import Header from '@/components/ui/Header'
-import { uploadFundingImage } from '@/app/create/actions'
-import { updateFunding } from './actions'
-import type { Funding, Gift } from '@/lib/supabase/types'
+import { useRef, useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
+import Input from "@/components/ui/Input";
+import Header from "@/components/ui/Header";
+import { uploadFundingImage } from "@/app/create/actions";
+import { updateFunding } from "./actions";
+import type { Funding, Gift } from "@/lib/supabase/types";
 
 type Props = {
-  token: string
-  funding: Funding
-  gift: Gift
-}
+  token: string;
+  funding: Funding;
+  gift: Gift;
+};
 
 export default function EditClient({ token, funding, gift }: Props) {
-  const router = useRouter()
-  const [isPending, startTransition] = useTransition()
+  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
 
-  const [title, setTitle] = useState(funding.title)
-  const [description, setDescription] = useState(funding.description ?? '')
-  const [endDate, setEndDate] = useState(funding.end_date.split('T')[0])
-  const [imageUrl, setImageUrl] = useState<string | null>(funding.image_url)
-  const [imagePreview, setImagePreview] = useState<string | null>(funding.image_url)
-  const [imageUploading, setImageUploading] = useState(false)
+  const [title, setTitle] = useState(funding.title);
+  const [description, setDescription] = useState(funding.description ?? "");
+  const [endDate, setEndDate] = useState(funding.end_date.split("T")[0]);
+  const [imageUrl, setImageUrl] = useState<string | null>(funding.image_url);
+  const [imagePreview, setImagePreview] = useState<string | null>(
+    funding.image_url,
+  );
+  const [imageUploading, setImageUploading] = useState(false);
 
-  const [giftTargetAmount, setGiftTargetAmount] = useState(String(gift.target_amount))
+  const [giftTargetAmount, setGiftTargetAmount] = useState(
+    String(gift.target_amount),
+  );
 
-  const [error, setError] = useState('')
-  const fileInputRef = useRef<HTMLInputElement>(null)
+  const [error, setError] = useState("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
-    setImagePreview(URL.createObjectURL(file))
-    setImageUploading(true)
-    setError('')
-    const formData = new FormData()
-    formData.append('file', file)
-    const result = await uploadFundingImage(formData)
-    setImageUploading(false)
-    if ('error' in result) {
-      setError(result.error)
-      setImagePreview(funding.image_url)
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setImagePreview(URL.createObjectURL(file));
+    setImageUploading(true);
+    setError("");
+    const formData = new FormData();
+    formData.append("file", file);
+    const result = await uploadFundingImage(formData);
+    setImageUploading(false);
+    if ("error" in result) {
+      setError(result.error);
+      setImagePreview(funding.image_url);
     } else {
-      setImageUrl(result.url)
+      setImageUrl(result.url);
     }
-  }
+  };
 
   const handleSave = () => {
-    if (!title) return setError('펀딩 제목을 입력해주세요')
-    if (!endDate) return setError('마감일을 선택해주세요')
-    if (!giftTargetAmount) return setError('목표 금액을 입력해주세요')
-    if (imageUploading) return setError('이미지 업로드 중입니다')
-    setError('')
+    if (!title) return setError("제목을 입력해주세요");
+    if (!endDate) return setError("마감일을 선택해주세요");
+    if (!giftTargetAmount) return setError("목표 금액을 입력해주세요");
+    if (imageUploading) return setError("이미지 업로드 중입니다");
+    setError("");
 
     startTransition(async () => {
       const result = await updateFunding(token, {
@@ -65,14 +69,14 @@ export default function EditClient({ token, funding, gift }: Props) {
         gift: {
           id: gift.id,
           name: title,
-          targetAmount: parseInt(giftTargetAmount.replace(/,/g, ''), 10),
-          description: '',
+          targetAmount: parseInt(giftTargetAmount.replace(/,/g, ""), 10),
+          description: "",
         },
-      })
-      if ('error' in result) return setError(result.error)
-      router.back()
-    })
-  }
+      });
+      if ("error" in result) return setError(result.error);
+      router.back();
+    });
+  };
 
   return (
     <>
@@ -80,15 +84,19 @@ export default function EditClient({ token, funding, gift }: Props) {
       <main className="px-4 py-6">
         <h1 className="text-xl font-bold mb-6">펀딩 수정하기</h1>
         <div className="flex flex-col gap-5">
-
           <div className="flex flex-col gap-1">
-            <label className="text-sm font-medium text-gray-700">대표 이미지</label>
+            <label className="text-sm font-medium text-gray-700"><span className="text-rose-500">*</span>이미지</label>
             <div
               className="relative border-2 border-dashed border-gray-200 rounded-xl overflow-hidden cursor-pointer hover:border-rose-300 transition-colors aspect-square"
               onClick={() => fileInputRef.current?.click()}
             >
               {imagePreview ? (
-                <Image src={imagePreview} alt="미리보기" fill className="object-cover" />
+                <Image
+                  src={imagePreview}
+                  alt="미리보기"
+                  fill
+                  className="object-cover"
+                />
               ) : (
                 <div className="flex flex-col items-center justify-center h-full text-gray-400 gap-2">
                   <span className="text-2xl">📷</span>
@@ -101,12 +109,22 @@ export default function EditClient({ token, funding, gift }: Props) {
                 </div>
               )}
             </div>
-            <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleImageChange} />
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleImageChange}
+            />
           </div>
 
-          <Input label="펀딩 제목" value={title} onChange={(e) => setTitle(e.target.value)} />
+          <Input
+            label={<><span className="text-rose-500">*</span>제목</>}
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+          />
           <div className="flex flex-col gap-1">
-            <label className="text-sm font-medium text-gray-700">설명 (선택)</label>
+            <label className="text-sm font-medium text-gray-700">설명 <span className="text-gray-400 font-normal">(선택)</span></label>
             <textarea
               className="border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-rose-300 resize-none"
               rows={3}
@@ -115,15 +133,15 @@ export default function EditClient({ token, funding, gift }: Props) {
             />
           </div>
           <Input
-            label="마감일"
+            label={<><span className="text-rose-500">*</span>마감일</>}
             type="date"
             value={endDate}
             onChange={(e) => setEndDate(e.target.value)}
-            min={new Date().toISOString().split('T')[0]}
+            min={new Date().toISOString().split("T")[0]}
           />
 
           <Input
-            label="목표 금액 (원)"
+            label={<><span className="text-rose-500">*</span>목표 금액 (원)</>}
             type="number"
             value={giftTargetAmount}
             onChange={(e) => setGiftTargetAmount(e.target.value)}
@@ -144,11 +162,11 @@ export default function EditClient({ token, funding, gift }: Props) {
               disabled={isPending || imageUploading}
               className="flex-1 h-[56px] rounded-[14px] bg-rose-500 text-white text-[17px] font-semibold hover:bg-rose-600 transition-colors disabled:opacity-40"
             >
-              {isPending ? '저장 중...' : '저장하기'}
+              {isPending ? "저장 중..." : "저장하기"}
             </button>
           </div>
         </div>
       </main>
     </>
-  )
+  );
 }

@@ -46,7 +46,7 @@ export default function CreatePage() {
   }
 
   const handleCreateFunding = () => {
-    if (!title) return setError('펀딩 제목을 입력해주세요')
+    if (!title) return setError('제목을 입력해주세요')
     if (!endDate) return setError('마감일을 선택해주세요')
     if (!giftTargetAmount) return setError('목표 금액을 입력해주세요')
     if (imageUploading) return setError('이미지 업로드 중입니다. 잠시 기다려주세요')
@@ -96,9 +96,9 @@ export default function CreatePage() {
       <main className="px-4 py-6">
         <h1 className="text-xl font-bold mb-6">펀딩 만들기 🎂</h1>
         <div className="flex flex-col gap-5">
-          {/* 대표 이미지 업로드 */}
+          {/* 이미지 업로드 */}
           <div className="flex flex-col gap-1">
-            <label className="text-sm font-medium text-gray-700">대표 이미지 (선택)</label>
+            <label className="text-sm font-medium text-gray-700"><span className="text-rose-500">*</span>이미지</label>
             <div
               className="relative border-2 border-dashed border-gray-200 rounded-xl overflow-hidden cursor-pointer hover:border-rose-300 transition-colors aspect-square"
               onClick={() => fileInputRef.current?.click()}
@@ -130,13 +130,13 @@ export default function CreatePage() {
           </div>
 
           <Input
-            label="펀딩 제목"
+            label={<><span className="text-rose-500">*</span>제목</>}
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="지수 생일 선물 펀딩 🎂"
           />
           <div className="flex flex-col gap-1">
-            <label className="text-sm font-medium text-gray-700">설명 (선택)</label>
+            <label className="text-sm font-medium text-gray-700">설명 <span className="text-gray-400 font-normal">(선택)</span></label>
             <textarea
               className="border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-rose-300 resize-none"
               rows={3}
@@ -146,7 +146,7 @@ export default function CreatePage() {
             />
           </div>
           <Input
-            label="마감일"
+            label={<><span className="text-rose-500">*</span>마감일</>}
             type="date"
             value={endDate}
             onChange={(e) => setEndDate(e.target.value)}
@@ -154,7 +154,7 @@ export default function CreatePage() {
           />
 
           <Input
-            label="목표 금액 (원)"
+            label={<><span className="text-rose-500">*</span>목표 금액 (원)</>}
             type="number"
             value={giftTargetAmount}
             onChange={(e) => setGiftTargetAmount(e.target.value)}
