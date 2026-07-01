@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
+import Header from '@/components/ui/Header'
 import { sendSignUpOtp, verifyOtpAndSetPassword } from './actions'
 
 export default function RegisterPage() {
@@ -43,8 +44,10 @@ export default function RegisterPage() {
   }
 
   return (
-    <main className="min-h-screen flex items-center justify-center px-4 bg-gray-50">
-      <div className="w-full max-w-md bg-white rounded-2xl p-8 shadow-sm flex flex-col gap-5">
+    <>
+      <Header backHref="/login" />
+      <main className="min-h-[calc(100vh-3.5rem)] flex items-center justify-center px-4">
+      <div className="w-full max-w-md flex flex-col gap-5">
         <div className="text-center mb-2">
           <div className="text-4xl mb-2">🎂</div>
           <h1 className="text-2xl font-bold text-gray-900">회원가입</h1>
@@ -118,6 +121,7 @@ export default function RegisterPage() {
           </Link>
         </p>
       </div>
-    </main>
+      </main>
+    </>
   )
 }

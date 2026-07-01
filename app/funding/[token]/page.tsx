@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import FundingRealtime from './FundingRealtime'
 import Button from '@/components/ui/Button'
+import Header from '@/components/ui/Header'
 
 function calcDday(endDate: string): string {
   const end = new Date(endDate)
@@ -45,15 +46,10 @@ export default async function FundingPage({
 
   return (
     <>
-      {/* TDS Top — 상단 네비게이션 */}
-      <header className="sticky top-0 z-10 bg-white/90 backdrop-blur-sm border-b border-gray-100">
-        <div className="max-w-md mx-auto px-4 h-14 flex items-center justify-between">
-          <Link href="/funding" className="text-gray-500 hover:text-gray-800 transition-colors">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M15 18l-6-6 6-6" />
-            </svg>
-          </Link>
-          <div className="flex items-center gap-2">
+      <Header
+        backHref="/funding"
+        right={
+          <>
             {isClosed && (
               <span className="text-xs text-gray-400 bg-gray-100 px-2.5 py-1 rounded-full">
                 마감
@@ -67,9 +63,9 @@ export default async function FundingPage({
                 관리
               </Link>
             )}
-          </div>
-        </div>
-      </header>
+          </>
+        }
+      />
 
       <main className="max-w-md mx-auto pb-32">
         {/* TDS Paragraph — 제목 영역 */}
@@ -119,7 +115,7 @@ export default async function FundingPage({
 
       {/* TDS BottomCTA — 하단 고정 버튼 */}
       {!isClosed && (
-        <div className="fixed bottom-0 left-0 right-0 z-10 bg-white/95 backdrop-blur-sm border-t border-gray-100">
+        <div className="fixed bottom-0 left-0 right-0 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 sm:w-[430px] z-10 bg-white/95 backdrop-blur-sm border-t border-gray-100">
           <div className="max-w-md mx-auto px-5 py-4">
             <Link href={`/funding/${params.token}/pay`}>
               <Button>선물하기 🎁</Button>
