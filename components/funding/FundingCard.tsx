@@ -29,7 +29,9 @@ export default function FundingCard({ funding, totalRaised, totalTarget }: Props
           {funding.image_url ? (
             <Image src={funding.image_url} alt={funding.title} fill className="object-cover" />
           ) : (
-            <Image src="/images/default-image.png" alt="기본 이미지" fill className="object-cover" />
+            <div className="flex items-center justify-center h-full bg-gray-100">
+              <Image src="/images/ic-birthday-cake.svg" alt="기본 이미지" width={72} height={72} style={{ filter: 'brightness(0) invert(78%)' }} />
+            </div>
           )}
           <div className="absolute top-3 right-3">
             <span className={`text-xs font-semibold px-2 py-1 rounded-full ${

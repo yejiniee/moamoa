@@ -1,58 +1,62 @@
-'use client'
+"use client";
 
-import { useRef, useState, useTransition } from 'react'
-import { useRouter } from 'next/navigation'
-import Image from 'next/image'
-import Button from '@/components/ui/Button'
-import Input from '@/components/ui/Input'
-import Header from '@/components/ui/Header'
-import { uploadFundingImage, createFunding } from './actions'
-
-type GiftInput = { name: string; targetAmount: string; description: string }
+import { useRef, useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
+import Button from "@/components/ui/Button";
+import Input from "@/components/ui/Input";
+import Header from "@/components/ui/Header";
+import { uploadFundingImage, createFunding } from "./actions";
 
 export default function CreatePage() {
-  const router = useRouter()
-  const [isPending, startTransition] = useTransition()
-  const [title, setTitle] = useState('')
-  const [description, setDescription] = useState('')
-  const [endDate, setEndDate] = useState('')
-  const [gift, setGift] = useState<GiftInput>({ name: '', targetAmount: '', description: '' })
-  const [error, setError] = useState('')
-  const [shareToken, setShareToken] = useState('')
+  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [giftTargetAmount, setGiftTargetAmount] = useState("");
+
+  const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const raw = e.target.value.replace(/[^0-9]/g, "");
+    setGiftTargetAmount(raw ? Number(raw).toLocaleString("ko-KR") : "");
+  };
+  const [error, setError] = useState("");
+  const [shareToken, setShareToken] = useState("");
 
   // 이미지 업로드 상태
-  const [imagePreview, setImagePreview] = useState<string | null>(null)
-  const [imageUrl, setImageUrl] = useState<string | null>(null)
-  const [imageUploading, setImageUploading] = useState(false)
-  const fileInputRef = useRef<HTMLInputElement>(null)
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [imageUploading, setImageUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
+    const file = e.target.files?.[0];
+    if (!file) return;
 
-    setImagePreview(URL.createObjectURL(file))
-    setImageUploading(true)
-    setError('')
+    setImagePreview(URL.createObjectURL(file));
+    setImageUploading(true);
+    setError("");
 
-    const formData = new FormData()
-    formData.append('file', file)
-    const result = await uploadFundingImage(formData)
-    setImageUploading(false)
+    const formData = new FormData();
+    formData.append("file", file);
+    const result = await uploadFundingImage(formData);
+    setImageUploading(false);
 
-    if ('error' in result) {
-      setError(result.error)
-      setImagePreview(null)
+    if ("error" in result) {
+      setError(result.error);
+      setImagePreview(null);
     } else {
-      setImageUrl(result.url)
+      setImageUrl(result.url);
     }
-  }
+  };
 
   const handleCreateFunding = () => {
-    if (!title) return setError('펀딩 제목을 입력해주세요')
-    if (!endDate) return setError('마감일을 선택해주세요')
-    if (!gift.name || !gift.targetAmount) return setError('선물 정보를 모두 입력해주세요')
-    if (imageUploading) return setError('이미지 업로드 중입니다. 잠시 기다려주세요')
-    setError('')
+    if (!title) return setError("제목을 입력해주세요");
+    if (!endDate) return setError("마감일을 선택해주세요");
+    if (!giftTargetAmount) return setError("목표 금액을 입력해주세요");
+    if (imageUploading)
+      return setError("이미지 업로드 중입니다. 잠시 기다려주세요");
+    setError("");
 
     startTransition(async () => {
       const result = await createFunding({
@@ -60,27 +64,35 @@ export default function CreatePage() {
         description,
         imageUrl,
         endDate,
-        gifts: [{
-          name: gift.name,
-          targetAmount: parseInt(gift.targetAmount.replace(/,/g, ''), 10),
-          description: gift.description,
-        }],
-      })
-      if ('error' in result) return setError(result.error)
-      setShareToken(result.shareToken)
-    })
-  }
+        gifts: [
+          {
+            name: title,
+            targetAmount: parseInt(giftTargetAmount.replace(/,/g, ""), 10),
+            description: "",
+          },
+        ],
+      });
+      if ("error" in result) return setError(result.error);
+      setShareToken(result.shareToken);
+    });
+  };
 
   if (shareToken) {
-    const shareUrl = `${window.location.origin}/funding/${shareToken}`
+    const shareUrl = `${window.location.origin}/funding/${shareToken}`;
     return (
       <main className="min-h-screen flex items-center justify-center px-4 bg-gray-50">
         <div className="w-full max-w-md bg-white rounded-2xl p-8 shadow-sm text-center flex flex-col gap-4">
           <div className="text-5xl">🎉</div>
           <h1 className="text-2xl font-bold">펀딩이 만들어졌어요!</h1>
-          <p className="text-gray-500 text-sm">아래 링크를 참여자들에게 공유하세요</p>
-          <div className="bg-gray-100 rounded-xl p-4 break-all text-sm text-gray-700">{shareUrl}</div>
-          <Button onClick={() => navigator.clipboard.writeText(shareUrl)}>링크 복사하기</Button>
+          <p className="text-gray-500 text-sm">
+            아래 링크를 참여자들에게 공유하세요
+          </p>
+          <div className="bg-gray-100 rounded-xl p-4 break-all text-sm text-gray-700">
+            {shareUrl}
+          </div>
+          <Button onClick={() => navigator.clipboard.writeText(shareUrl)}>
+            링크 복사하기
+          </Button>
           <button
             className="mt-1 text-sm text-rose-500 hover:underline"
             onClick={() => router.push(`/funding/${shareToken}`)}
@@ -89,7 +101,7 @@ export default function CreatePage() {
           </button>
         </div>
       </main>
-    )
+    );
   }
 
   return (
@@ -98,16 +110,20 @@ export default function CreatePage() {
       <main className="px-4 py-6">
         <h1 className="text-xl font-bold mb-6">펀딩 만들기 🎂</h1>
         <div className="flex flex-col gap-5">
-          {/* 대표 이미지 업로드 */}
+          {/* 이미지 업로드 */}
           <div className="flex flex-col gap-1">
-            <label className="text-sm font-medium text-gray-700">대표 이미지 (선택)</label>
+            <label className="text-sm font-medium text-gray-700">이미지</label>
             <div
-              className="relative border-2 border-dashed border-gray-200 rounded-xl overflow-hidden cursor-pointer hover:border-rose-300 transition-colors"
-              style={{ height: 160 }}
+              className="relative border-2 border-dashed border-gray-200 rounded-xl overflow-hidden cursor-pointer hover:border-rose-300 transition-colors aspect-square"
               onClick={() => fileInputRef.current?.click()}
             >
               {imagePreview ? (
-                <Image src={imagePreview} alt="미리보기" fill className="object-cover" />
+                <Image
+                  src={imagePreview}
+                  alt="미리보기"
+                  fill
+                  className="object-cover"
+                />
               ) : (
                 <div className="flex flex-col items-center justify-center h-full text-gray-400 gap-2">
                   <span className="text-2xl">📷</span>
@@ -133,13 +149,17 @@ export default function CreatePage() {
           </div>
 
           <Input
-            label="펀딩 제목"
+            label={
+              <>
+                <span className="text-rose-500">*</span>제목
+              </>
+            }
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="지수 생일 선물 펀딩 🎂"
           />
           <div className="flex flex-col gap-1">
-            <label className="text-sm font-medium text-gray-700">설명 (선택)</label>
+            <label className="text-sm font-medium text-gray-700">설명</label>
             <textarea
               className="border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-rose-300 resize-none"
               rows={3}
@@ -149,40 +169,38 @@ export default function CreatePage() {
             />
           </div>
           <Input
-            label="마감일"
+            label={
+              <>
+                <span className="text-rose-500">*</span>마감일
+              </>
+            }
             type="date"
             value={endDate}
             onChange={(e) => setEndDate(e.target.value)}
-            min={new Date().toISOString().split('T')[0]}
+            min={new Date().toISOString().split("T")[0]}
           />
 
           <Input
-            label="선물 이름"
-            value={gift.name}
-            onChange={(e) => setGift({ ...gift, name: e.target.value })}
-            placeholder="에어팟 프로"
-          />
-          <Input
-            label="목표 금액 (원)"
-            type="number"
-            value={gift.targetAmount}
-            onChange={(e) => setGift({ ...gift, targetAmount: e.target.value })}
-            placeholder="350000"
-            min={1000}
-          />
-          <Input
-            label="선물 설명 (선택)"
-            value={gift.description}
-            onChange={(e) => setGift({ ...gift, description: e.target.value })}
-            placeholder="2세대 에어팟 프로"
+            label={
+              <>
+                <span className="text-rose-500">*</span>목표 금액 (원)
+              </>
+            }
+            value={giftTargetAmount}
+            onChange={handleAmountChange}
+            placeholder="350,000"
+            inputMode="numeric"
           />
 
           {error && <p className="text-sm text-red-500">{error}</p>}
-          <Button onClick={handleCreateFunding} disabled={isPending || imageUploading}>
-            {isPending ? '생성 중...' : '펀딩 만들기 🎂'}
+          <Button
+            onClick={handleCreateFunding}
+            disabled={isPending || imageUploading}
+          >
+            {isPending ? "생성 중..." : "펀딩 만들기 🎂"}
           </Button>
         </div>
       </main>
     </>
-  )
+  );
 }

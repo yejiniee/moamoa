@@ -1,11 +1,11 @@
 type InputProps = React.InputHTMLAttributes<HTMLInputElement> & {
-  label?: string
+  label?: React.ReactNode
   error?: string
   hint?: string
 }
 
 export default function Input({ label, error, hint, className = '', id, ...props }: InputProps) {
-  const inputId = id ?? label
+  const inputId = id ?? (typeof label === 'string' ? label : undefined)
 
   return (
     <div className="flex flex-col gap-1.5">

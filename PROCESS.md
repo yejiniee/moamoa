@@ -108,7 +108,7 @@ UI는 **Toss Design System (TDS)** 을 참고한다.
 - [x] **Task 6: 펀딩 생성 페이지 수정 (1단계 UI)**
   - `app/create/page.tsx` — 클라이언트 컴포넌트
   - Step 1~2 (이메일 OTP) 제거 → 바로 펀딩 정보 입력
-  - 펀딩 제목 / 설명 / 마감일 / 선물 목록 입력
+  - 제목 / 설명 / 마감일 / 목표 금액 입력
   - **대표 이미지 업로드**: 파일 선택 → Supabase Storage `funding-images` 버킷 업로드 → 공개 URL을 `fundings.image_url` 컬럼에 저장
   - 완료: 공유 링크 표시 + 복사 버튼
 
