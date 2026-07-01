@@ -1,48 +1,70 @@
-import { notFound } from 'next/navigation'
-import Image from 'next/image'
-import Link from 'next/link'
-import { createClient } from '@/lib/supabase/server'
-import FundingRealtime from './FundingRealtime'
-import Button from '@/components/ui/Button'
-import Header from '@/components/ui/Header'
+import { notFound } from "next/navigation";
+import Image from "next/image";
+import Link from "next/link";
+import { createClient } from "@/lib/supabase/server";
+import FundingRealtime from "./FundingRealtime";
+import Button from "@/components/ui/Button";
+import Header from "@/components/ui/Header";
+import SettleButton from "@/components/funding/SettleButton";
 
 function calcDday(endDate: string): string {
-  const end = new Date(endDate)
-  const now = new Date()
-  const diffDays = Math.ceil((end.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
-  if (diffDays < 0) return '마감'
-  if (diffDays === 0) return 'D-day'
-  return `D-${diffDays}`
+  const end = new Date(endDate);
+  const now = new Date();
+  const diffDays = Math.ceil(
+    (end.getTime() - now.getTime()) / (1000 * 60 * 60 * 24),
+  );
+  if (diffDays < 0) return "마감";
+  if (diffDays === 0) return "D-day";
+  return `D-${diffDays}`;
 }
 
 export default async function FundingPage({
   params,
 }: {
-  params: { token: string }
+  params: { token: string };
 }) {
-  const supabase = await createClient()
+  const supabase = await createClient();
 
-  const [{ data: funding }, { data: { user } }] = await Promise.all([
-    supabase.from('fundings').select('*').eq('share_token', params.token).single(),
+  const [
+    { data: funding },
+    {
+      data: { user },
+    },
+  ] = await Promise.all([
+    supabase
+      .from("fundings")
+      .select("*")
+      .eq("share_token", params.token)
+      .single(),
     supabase.auth.getUser(),
-  ])
+  ]);
 
-  if (!funding) notFound()
+  if (!funding) notFound();
 
-  const isOwner = !!user && user.id === funding.creator_user_id
+  const isOwner = !!user && user.id === funding.creator_user_id;
 
   const [{ data: gifts }, { data: payments }] = await Promise.all([
-    supabase.from('gifts').select('*').eq('funding_id', funding.id).order('created_at'),
     supabase
-      .from('payments')
-      .select('*')
-      .eq('funding_id', funding.id)
-      .eq('status', 'confirmed')
-      .order('created_at', { ascending: false }),
-  ])
+      .from("gifts")
+      .select("*")
+      .eq("funding_id", funding.id)
+      .order("created_at"),
+    supabase
+      .from("payments")
+      .select("*")
+      .eq("funding_id", funding.id)
+      .eq("status", "confirmed")
+      .order("created_at", { ascending: false }),
+  ]);
 
-  const dday = calcDday(funding.end_date)
-  const isClosed = funding.status === 'closed'
+  const dday = calcDday(funding.end_date);
+  const isClosed = funding.status === "closed";
+  const totalTarget = (gifts ?? []).reduce(
+    (sum, g) => sum + g.target_amount,
+    0,
+  );
+  const totalPaid = (payments ?? []).reduce((sum, p) => sum + p.amount, 0);
+  const goalReached = totalTarget > 0 && totalPaid >= totalTarget;
 
   return (
     <>
@@ -67,12 +89,18 @@ export default async function FundingPage({
         }
       />
 
-      <main className="max-w-md mx-auto pb-32">
+      <main className="max-w-md mx-auto">
         {/* TDS Paragraph — 제목 영역 */}
         <div className="px-5 pt-6 pb-4">
-          <span className="inline-block text-xs font-semibold text-rose-500 bg-rose-50 px-2.5 py-1 rounded-full mb-3">
-            {dday}
-          </span>
+          {isClosed ? (
+            <span className="inline-block text-xs font-semibold text-gray-500 bg-gray-100 px-2.5 py-1 rounded-full mb-3">
+              종료
+            </span>
+          ) : (
+            <span className="inline-block text-xs font-semibold text-rose-500 bg-rose-50 px-2.5 py-1 rounded-full mb-3">
+              {dday}
+            </span>
+          )}
           <h1 className="text-[22px] font-bold text-[#191F28] leading-snug">
             {funding.title}
           </h1>
@@ -113,16 +141,23 @@ export default async function FundingPage({
         </div>
       </main>
 
-      {/* TDS BottomCTA — 하단 고정 버튼 */}
-      {!isClosed && (
-        <div className="fixed bottom-0 left-0 right-0 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 sm:w-[430px] z-10 bg-white/95 backdrop-blur-sm border-t border-gray-100">
-          <div className="max-w-md mx-auto px-5 py-4">
-            <Link href={`/funding/${params.token}/pay`}>
-              <Button>선물하기 🎁</Button>
-            </Link>
+      <div className="max-w-md mx-auto px-5 py-6">
+        {isOwner ? (
+          <SettleButton
+            fundingId={funding.id}
+            goalReached={goalReached}
+            defaultSettled={isClosed}
+          />
+        ) : isClosed ? (
+          <div className="h-[56px] flex items-center justify-center rounded-[14px] bg-gray-100 text-gray-400 text-[17px] font-semibold">
+            마감된 펀딩이에요
           </div>
-        </div>
-      )}
+        ) : (
+          <Link href={`/funding/${params.token}/pay`}>
+            <Button>선물하기 🎁</Button>
+          </Link>
+        )}
+      </div>
     </>
-  )
+  );
 }
