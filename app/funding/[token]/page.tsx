@@ -132,7 +132,7 @@ export default async function FundingPage({
         </div>
 
         {/* 달성률 / 선물 목록 / 후원자 롤링 */}
-        <div className="px-5 pt-6">
+        <div className="px-5 pt-2">
           <FundingRealtime
             fundingId={funding.id}
             gifts={gifts ?? []}

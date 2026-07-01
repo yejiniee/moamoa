@@ -1,7 +1,7 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
-import { formatKRW } from '@/lib/utils'
+import { useEffect, useState } from 'react'
+
 import type { Payment } from '@/lib/supabase/types'
 
 function maskName(name: string): string {
@@ -16,45 +16,63 @@ type Props = {
   isOwner: boolean
 }
 
+// todo: 나중에 ui 수정 예정
 export default function DonorRolling({ payments, isOwner }: Props) {
-  const trackRef = useRef<HTMLDivElement>(null)
+  const [index, setIndex] = useState(0)
+  const [show, setShow] = useState(true)
 
   useEffect(() => {
-    const track = trackRef.current
-    if (!track || payments.length === 0) return
-
-    // 애니메이션 속도: 항목 수 * 3초
-    const duration = Math.max(payments.length * 3, 10)
-    track.style.animationDuration = `${duration}s`
+    if (payments.length <= 1) return
+    const timer = setInterval(() => {
+      setShow(false)
+      setTimeout(() => {
+        setIndex((i) => (i + 1) % payments.length)
+        setShow(true)
+      }, 300)
+    }, 3000)
+    return () => clearInterval(timer)
   }, [payments.length])
 
   if (payments.length === 0) return null
 
-  // 롤링을 위해 배열 2배 복제
-  const doubled = [...payments, ...payments]
+  const p = payments[index]
+  const name = isOwner ? p.participant_name : maskName(p.participant_name)
 
   return (
-    <div className="overflow-hidden rounded-xl bg-rose-50 py-3">
+    <div className="relative" style={{ marginBottom: '14px' }}>
       <div
-        ref={trackRef}
-        className="flex gap-4 animate-scroll-x"
-        style={{ width: 'max-content' }}
+        className="rounded-xl px-4"
+        style={{ background: 'rgba(0,0,0,0.45)', height: '44px', display: 'flex', alignItems: 'center' }}
       >
-        {doubled.map((p, i) => (
-          <div
-            key={`${p.id}-${i}`}
-            className="shrink-0 flex items-center gap-2 bg-white rounded-full px-4 py-2 shadow-sm border border-rose-100"
-          >
-            <span className="text-sm font-medium text-gray-800">
-              {isOwner ? p.participant_name : maskName(p.participant_name)}
-            </span>
-            <span className="text-xs text-rose-500 font-semibold">{formatKRW(p.amount)}</span>
-            {p.message && (
-              <span className="text-xs text-gray-400 max-w-[100px] truncate">&ldquo;{p.message}&rdquo;</span>
-            )}
-          </div>
-        ))}
+        <div
+          style={{
+            opacity: show ? 1 : 0,
+            transform: show ? 'translateY(0)' : 'translateY(-6px)',
+            transition: 'opacity 0.3s ease, transform 0.3s ease',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            width: '100%',
+          }}
+        >
+          <span className="text-sm font-semibold text-white shrink-0">{name}</span>
+          {p.message && (
+            <span className="text-xs text-white/50 truncate">&ldquo;{p.message}&rdquo;</span>
+          )}
+        </div>
       </div>
+      {/* 말풍선 꼬리 — 왼쪽 하단 */}
+      <div
+        style={{
+          position: 'absolute',
+          bottom: -10,
+          left: 16,
+          width: 0,
+          height: 0,
+          borderTop: '10px solid rgba(0,0,0,0.45)',
+          borderRight: '12px solid transparent',
+        }}
+      />
     </div>
   )
 }
