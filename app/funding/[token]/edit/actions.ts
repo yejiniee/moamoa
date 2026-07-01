@@ -53,5 +53,6 @@ export async function updateFunding(
   if (giftError) return { error: giftError.message }
 
   revalidatePath(`/funding/${token}`)
+  revalidatePath(`/funding/${token}/admin`)
   return { success: true as const }
 }

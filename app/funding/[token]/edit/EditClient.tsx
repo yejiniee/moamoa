@@ -72,13 +72,13 @@ export default function EditClient({ token, funding, gift }: Props) {
         },
       })
       if ('error' in result) return setError(result.error)
-      router.push(`/funding/${token}/admin`)
+      router.back()
     })
   }
 
   return (
     <>
-      <Header backHref={`/funding/${token}/admin`} />
+      <Header />
       <main className="px-4 py-6">
         <h1 className="text-xl font-bold mb-6">펀딩 수정하기</h1>
         <div className="flex flex-col gap-5">
@@ -142,7 +142,7 @@ export default function EditClient({ token, funding, gift }: Props) {
           {error && <p className="text-sm text-red-500">{error}</p>}
           <div className="flex gap-3">
             <button
-              onClick={() => router.push(`/funding/${token}/admin`)}
+              onClick={() => router.back()}
               disabled={isPending}
               className="flex-1 h-[56px] rounded-[14px] border border-gray-200 text-[17px] font-semibold text-gray-600 hover:bg-gray-50 transition-colors disabled:opacity-40"
             >
