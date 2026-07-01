@@ -119,11 +119,13 @@ export default async function FundingPage({
                 src={funding.image_url}
                 alt={funding.title}
                 fill
-                className="object-cover"
+                className="object-contain"
                 priority
               />
             ) : (
-              <Image src="/images/default-image.png" alt="기본 이미지" fill className="object-cover" />
+              <div className="flex items-center justify-center h-full bg-gray-100">
+                <Image src="/images/ic-birthday-cake.svg" alt="기본 이미지" width={120} height={120} style={{ filter: 'brightness(0) invert(78%)' }} />
+              </div>
             )}
           </div>
         </div>

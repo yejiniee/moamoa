@@ -29,12 +29,12 @@ export default function EditClient({ token, funding, gift }: Props) {
   const [imageUploading, setImageUploading] = useState(false);
 
   const [giftTargetAmount, setGiftTargetAmount] = useState(
-    Number(gift.target_amount).toLocaleString('ko-KR'),
-  )
+    Number(gift.target_amount).toLocaleString("ko-KR"),
+  );
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const raw = e.target.value.replace(/[^0-9]/g, '')
-    setGiftTargetAmount(raw ? Number(raw).toLocaleString('ko-KR') : '')
+    const raw = e.target.value.replace(/[^0-9]/g, "");
+    setGiftTargetAmount(raw ? Number(raw).toLocaleString("ko-KR") : "");
   };
 
   const [error, setError] = useState("");
@@ -90,7 +90,7 @@ export default function EditClient({ token, funding, gift }: Props) {
         <h1 className="text-xl font-bold mb-6">펀딩 수정하기</h1>
         <div className="flex flex-col gap-5">
           <div className="flex flex-col gap-1">
-            <label className="text-sm font-medium text-gray-700"><span className="text-rose-500">*</span>이미지</label>
+            <label className="text-sm font-medium text-gray-700">이미지</label>
             <div
               className="relative border-2 border-dashed border-gray-200 rounded-xl overflow-hidden cursor-pointer hover:border-rose-300 transition-colors aspect-square"
               onClick={() => fileInputRef.current?.click()}
@@ -124,7 +124,11 @@ export default function EditClient({ token, funding, gift }: Props) {
           </div>
 
           <Input
-            label={<><span className="text-rose-500">*</span>제목</>}
+            label={
+              <>
+                <span className="text-rose-500">*</span>제목
+              </>
+            }
             value={title}
             onChange={(e) => setTitle(e.target.value)}
           />
@@ -138,7 +142,11 @@ export default function EditClient({ token, funding, gift }: Props) {
             />
           </div>
           <Input
-            label={<><span className="text-rose-500">*</span>마감일</>}
+            label={
+              <>
+                <span className="text-rose-500">*</span>마감일
+              </>
+            }
             type="date"
             value={endDate}
             onChange={(e) => setEndDate(e.target.value)}
@@ -146,7 +154,11 @@ export default function EditClient({ token, funding, gift }: Props) {
           />
 
           <Input
-            label={<><span className="text-rose-500">*</span>목표 금액 (원)</>}
+            label={
+              <>
+                <span className="text-rose-500">*</span>목표 금액 (원)
+              </>
+            }
             value={giftTargetAmount}
             onChange={handleAmountChange}
             inputMode="numeric"
