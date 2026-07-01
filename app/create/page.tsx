@@ -100,8 +100,7 @@ export default function CreatePage() {
           <div className="flex flex-col gap-1">
             <label className="text-sm font-medium text-gray-700">대표 이미지 (선택)</label>
             <div
-              className="relative border-2 border-dashed border-gray-200 rounded-xl overflow-hidden cursor-pointer hover:border-rose-300 transition-colors"
-              style={{ height: 160 }}
+              className="relative border-2 border-dashed border-gray-200 rounded-xl overflow-hidden cursor-pointer hover:border-rose-300 transition-colors aspect-square"
               onClick={() => fileInputRef.current?.click()}
             >
               {imagePreview ? (
