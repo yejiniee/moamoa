@@ -15,6 +15,11 @@ export default function CreatePage() {
   const [description, setDescription] = useState('')
   const [endDate, setEndDate] = useState('')
   const [giftTargetAmount, setGiftTargetAmount] = useState('')
+
+  const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const raw = e.target.value.replace(/[^0-9]/g, '')
+    setGiftTargetAmount(raw ? Number(raw).toLocaleString('ko-KR') : '')
+  }
   const [error, setError] = useState('')
   const [shareToken, setShareToken] = useState('')
 
@@ -155,11 +160,10 @@ export default function CreatePage() {
 
           <Input
             label={<><span className="text-rose-500">*</span>목표 금액 (원)</>}
-            type="number"
             value={giftTargetAmount}
-            onChange={(e) => setGiftTargetAmount(e.target.value)}
-            placeholder="350000"
-            min={1000}
+            onChange={handleAmountChange}
+            placeholder="350,000"
+            inputMode="numeric"
           />
 
           {error && <p className="text-sm text-red-500">{error}</p>}

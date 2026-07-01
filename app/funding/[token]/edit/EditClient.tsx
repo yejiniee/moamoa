@@ -29,8 +29,13 @@ export default function EditClient({ token, funding, gift }: Props) {
   const [imageUploading, setImageUploading] = useState(false);
 
   const [giftTargetAmount, setGiftTargetAmount] = useState(
-    String(gift.target_amount),
-  );
+    Number(gift.target_amount).toLocaleString('ko-KR'),
+  )
+
+  const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const raw = e.target.value.replace(/[^0-9]/g, '')
+    setGiftTargetAmount(raw ? Number(raw).toLocaleString('ko-KR') : '')
+  };
 
   const [error, setError] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -142,10 +147,9 @@ export default function EditClient({ token, funding, gift }: Props) {
 
           <Input
             label={<><span className="text-rose-500">*</span>목표 금액 (원)</>}
-            type="number"
             value={giftTargetAmount}
-            onChange={(e) => setGiftTargetAmount(e.target.value)}
-            min={1000}
+            onChange={handleAmountChange}
+            inputMode="numeric"
           />
 
           {error && <p className="text-sm text-red-500">{error}</p>}
