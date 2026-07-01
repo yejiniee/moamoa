@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 
 type Props = {
   backHref?: string
@@ -29,9 +30,9 @@ export default function Header({ backHref, right }: Props) {
 
         <Link
           href="/"
-          className="absolute left-1/2 -translate-x-1/2 text-sm font-bold text-rose-500 tracking-tight hover:text-rose-600 transition-colors"
+          className="absolute left-1/2 -translate-x-1/2 hover:opacity-80 transition-opacity"
         >
-          🎂 모아모아
+          <Image src="/images/logo.svg" alt="모아모아" width={80} height={28} priority />
         </Link>
 
         {right && <div className="flex items-center gap-2">{right}</div>}

@@ -123,9 +123,7 @@ export default async function FundingPage({
                 priority
               />
             ) : (
-              <div className="flex flex-col items-center justify-center h-full gap-2 text-gray-300">
-                <span className="text-5xl">🎂</span>
-              </div>
+              <Image src="/images/default-image.png" alt="기본 이미지" fill className="object-cover" />
             )}
           </div>
         </div>

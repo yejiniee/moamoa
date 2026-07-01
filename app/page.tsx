@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import Button from '@/components/ui/Button'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 
@@ -18,8 +19,8 @@ export default async function LandingPage() {
 
         {/* Hero */}
         <div className="text-center flex flex-col items-center gap-4">
-          <div className="w-20 h-20 bg-rose-50 rounded-[24px] flex items-center justify-center text-[44px] shadow-sm">
-            🎂
+          <div className="w-20 h-20 flex items-center justify-center">
+            <Image src="/images/logo.svg" alt="모아모아" width={80} height={80} priority />
           </div>
           <div className="flex flex-col gap-2">
             <h1 className="text-[28px] font-bold text-[#191F28] leading-tight tracking-tight">
