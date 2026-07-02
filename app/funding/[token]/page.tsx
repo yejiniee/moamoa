@@ -1,5 +1,4 @@
 import { notFound } from "next/navigation";
-import Image from "next/image";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import FundingRealtime from "./FundingRealtime";
@@ -106,35 +105,12 @@ export default async function FundingPage({
           )}
         </div>
 
-        {/* TDS Card — 대표 이미지 (제목 아래, 카드형) */}
-        <div className="px-5">
-          <div className="relative w-full aspect-[4/3] rounded-2xl overflow-hidden bg-gray-100 shadow-sm">
-            {funding.image_url ? (
-              <Image
-                src={funding.image_url}
-                alt={funding.title}
-                fill
-                className="object-contain"
-                priority
-              />
-            ) : (
-              <div className="flex items-center justify-center h-full bg-gray-100">
-                <Image
-                  src="/images/ic-birthday-cake.svg"
-                  alt="기본 이미지"
-                  width={120}
-                  height={120}
-                  style={{ filter: "brightness(0) invert(78%)" }}
-                />
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* 달성률 / 선물 목록 / 후원자 롤링 */}
+        {/* 이미지 + 달성률 / 후원자 롤링 */}
         <div className="px-5 pt-2">
           <FundingRealtime
             fundingId={funding.id}
+            imageUrl={funding.image_url}
+            title={funding.title}
             gifts={gifts ?? []}
             initialPayments={payments ?? []}
             isOwner={isOwner}

@@ -22,7 +22,13 @@ export default async function LandingPage() {
         <div className="text-center flex flex-col items-center gap-4">
           <div className="flex flex-col gap-2">
             <div className="flex justify-center">
-              <Image src="/images/logo.svg" alt="모아모아" width={120} height={40} priority />
+              <Image
+                src="/images/logo.svg"
+                alt="모아모아"
+                width={120}
+                height={40}
+                priority
+              />
             </div>
             <p className="text-[16px] text-gray-500 leading-relaxed">
               소중한 사람의 생일 선물을
