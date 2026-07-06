@@ -28,7 +28,7 @@ export default function RegisterPage() {
     setError('')
     if (!email) return setEmailError('이메일을 입력해주세요')
     if (!PASSWORD_PATTERN.test(password)) {
-      return setPasswordError('영문, 숫자, 특수문자를 포함해 6자 이상 입력해주세요')
+      return setPasswordError('영문, 숫자, 특수문자를 모두 포함해주세요')
     }
     if (password !== passwordConfirm) return setError('비밀번호가 일치하지 않아요')
 
@@ -87,7 +87,6 @@ export default function RegisterPage() {
               onChange={(e) => setPassword(e.target.value)}
               placeholder="영문, 숫자, 특수문자 포함 6자 이상"
               error={passwordError}
-              hint="영문, 숫자, 특수문자를 모두 포함해주세요"
             />
             <Input
               label="비밀번호 확인"
