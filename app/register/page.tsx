@@ -160,8 +160,6 @@ export default function RegisterPage() {
             <div className="text-center">
               <p className="text-lg font-bold text-gray-900">지금은 회원가입이 어려워요</p>
               <p className="text-sm text-gray-500 mt-2 leading-relaxed">
-                서비스 준비 중이라 아무 이메일로나 인증 메일을 보낼 수 없어요.
-                <br />
                 아래 테스트 계정으로 로그인해서 이용해주세요.
               </p>
             </div>
