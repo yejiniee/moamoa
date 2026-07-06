@@ -8,6 +8,8 @@ import Input from '@/components/ui/Input'
 import Header from '@/components/ui/Header'
 import { sendSignUpOtp, verifyOtpAndSetPassword } from './actions'
 
+const PASSWORD_PATTERN = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[^A-Za-z0-9]).{6,}$/
+
 export default function RegisterPage() {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
@@ -17,13 +19,17 @@ export default function RegisterPage() {
   const [passwordConfirm, setPasswordConfirm] = useState('')
   const [otp, setOtp] = useState('')
   const [emailError, setEmailError] = useState('')
+  const [passwordError, setPasswordError] = useState('')
   const [error, setError] = useState('')
 
   const handleSendOtp = () => {
     setEmailError('')
+    setPasswordError('')
     setError('')
     if (!email) return setEmailError('이메일을 입력해주세요')
-    if (password.length < 6) return setError('비밀번호는 6자 이상이어야 해요')
+    if (!PASSWORD_PATTERN.test(password)) {
+      return setPasswordError('영문, 숫자, 특수문자를 포함해 6자 이상 입력해주세요')
+    }
     if (password !== passwordConfirm) return setError('비밀번호가 일치하지 않아요')
 
     startTransition(async () => {
@@ -79,7 +85,9 @@ export default function RegisterPage() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="6자 이상"
+              placeholder="영문, 숫자, 특수문자 포함 6자 이상"
+              error={passwordError}
+              hint="영문, 숫자, 특수문자를 모두 포함해주세요"
             />
             <Input
               label="비밀번호 확인"
@@ -110,7 +118,7 @@ export default function RegisterPage() {
             </Button>
             <button
               className="text-sm text-gray-400 hover:underline"
-              onClick={() => { setStep(1); setError(''); setEmailError('') }}
+              onClick={() => { setStep(1); setError(''); setEmailError(''); setPasswordError('') }}
             >
               이메일 다시 입력
             </button>
