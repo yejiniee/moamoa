@@ -6,14 +6,15 @@
 -- ============================================================
 
 create table if not exists fundings (
-  id            uuid primary key default gen_random_uuid(),
-  creator_email text not null,
-  title         text not null,
-  description   text,
-  end_date      timestamptz not null,
-  share_token   text unique not null,
-  status        text not null default 'active' check (status in ('active', 'closed')),
-  created_at    timestamptz not null default now()
+  id               uuid primary key default gen_random_uuid(),
+  creator_user_id  uuid references auth.users(id) on delete set null,
+  title            text not null,
+  description      text,
+  image_url        text,
+  end_date         timestamptz not null,
+  share_token      text unique not null,
+  status           text not null default 'active' check (status in ('active', 'closed')),
+  created_at       timestamptz not null default now()
 );
 
 create table if not exists gifts (
