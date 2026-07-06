@@ -10,43 +10,6 @@ import { formatKRW } from "@/lib/utils";
 import { deleteFunding } from "./actions";
 import type { Funding, Payment } from "@/lib/supabase/types";
 
-// TODO: 실제 데이터 연결 후 제거
-const MOCK_PAYMENTS: Payment[] = [
-  {
-    id: "mock-1",
-    funding_id: "",
-    participant_name: "김지수",
-    amount: 30000,
-    message: "생일 축하해! 🎉",
-    order_id: "mock-order-1",
-    payment_key: null,
-    status: "confirmed",
-    created_at: "2025-06-28T10:00:00Z",
-  },
-  {
-    id: "mock-2",
-    funding_id: "",
-    participant_name: "박민준",
-    amount: 50000,
-    message: "항상 건강하게 지내",
-    order_id: "mock-order-2",
-    payment_key: null,
-    status: "confirmed",
-    created_at: "2025-06-29T14:30:00Z",
-  },
-  {
-    id: "mock-3",
-    funding_id: "",
-    participant_name: "이수아",
-    amount: 20000,
-    message: null,
-    order_id: "mock-order-3",
-    payment_key: null,
-    status: "confirmed",
-    created_at: "2025-06-30T09:15:00Z",
-  },
-];
-
 type Props = {
   funding: Funding;
   payments: Payment[];
@@ -63,12 +26,6 @@ export default function AdminClient({
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-
-  const displayPayments = payments.length > 0 ? payments : MOCK_PAYMENTS;
-  const displayTotal =
-    payments.length > 0
-      ? totalAmount
-      : MOCK_PAYMENTS.reduce((s, p) => s + p.amount, 0);
 
   const handleDelete = () => {
     startTransition(async () => {
@@ -97,10 +54,10 @@ export default function AdminClient({
         <div className="bg-rose-50 rounded-2xl p-5">
           <p className="text-sm text-gray-500 mb-1">총 모인 금액</p>
           <p className="text-3xl font-bold text-rose-500">
-            {formatKRW(displayTotal)}
+            {formatKRW(totalAmount)}
           </p>
           <p className="text-xs text-gray-400 mt-1">
-            {displayPayments.length}명 참여
+            {payments.length}명 참여
           </p>
         </div>
 
@@ -128,10 +85,10 @@ export default function AdminClient({
           <h2 className="text-sm font-semibold text-gray-700">
             펀딩 참여자{" "}
             <span className="text-gray-400 font-normal">
-              {displayPayments.length}명
+              {payments.length}명
             </span>
           </h2>
-          {displayPayments.map((p) => (
+          {payments.map((p) => (
             <div
               key={p.id}
               className="bg-white rounded-2xl px-4 py-3.5 shadow-sm border border-gray-50 flex items-center justify-between gap-3"
