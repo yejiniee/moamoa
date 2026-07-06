@@ -26,8 +26,11 @@ export default function PayClient({ fundingId, fundingTitle }: Props) {
       const result = await createPendingPayment(fundingId, name, message, amount)
       if ('error' in result) return setError(result.error)
 
+      const clientKey = process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY
+      if (!clientKey) return setError('결제 설정이 누락되었습니다 (NEXT_PUBLIC_TOSS_CLIENT_KEY)')
+
       try {
-        const tossPayments = await loadTossPayments(process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY!)
+        const tossPayments = await loadTossPayments(clientKey)
         await tossPayments.requestPayment('카드', {
           amount,
           orderId: result.orderId,
@@ -37,8 +40,10 @@ export default function PayClient({ fundingId, fundingTitle }: Props) {
           customerName: name,
         })
       } catch (e: unknown) {
-        if (e instanceof Error && e.message !== 'User canceled payment.') {
-          setError('결제 중 오류가 발생했습니다')
+        const msg = e instanceof Error ? e.message : String(e)
+        if (msg !== 'User canceled payment.') {
+          console.error('[Toss 결제 오류]', e)
+          setError(msg || '결제 중 오류가 발생했습니다')
         }
       }
     })
