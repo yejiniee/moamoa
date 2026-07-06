@@ -113,7 +113,6 @@ export default async function FundingPage({
             title={funding.title}
             gifts={gifts ?? []}
             initialPayments={payments ?? []}
-            isOwner={isOwner}
           />
         </div>
       </main>

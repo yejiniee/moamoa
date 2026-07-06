@@ -63,7 +63,6 @@ type Props = {
   title: string;
   gifts: Gift[];
   initialPayments: Payment[];
-  isOwner: boolean;
 };
 
 export default function FundingRealtime({
@@ -72,7 +71,6 @@ export default function FundingRealtime({
   title,
   gifts,
   initialPayments,
-  isOwner,
 }: Props) {
   const effectiveInitial =
     initialPayments.length === 0 ? MOCK_PAYMENTS : initialPayments;
