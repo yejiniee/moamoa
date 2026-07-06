@@ -10,9 +10,10 @@ import { signOut } from '@/app/login/actions'
 type Props = {
   backHref?: string
   right?: React.ReactNode
+  hideLogout?: boolean
 }
 
-export default function Header({ backHref, right }: Props) {
+export default function Header({ backHref, right, hideLogout }: Props) {
   const router = useRouter()
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [isPending, startTransition] = useTransition()
@@ -60,10 +61,10 @@ export default function Header({ backHref, right }: Props) {
           <Image src="/images/logo.svg" alt="모아모아" width={80} height={28} priority />
         </Link>
 
-        {(right || isLoggedIn) && (
+        {(right || (isLoggedIn && !hideLogout)) && (
           <div className="flex items-center gap-2">
             {right}
-            {isLoggedIn && (
+            {isLoggedIn && !hideLogout && (
               <button
                 onClick={handleSignOut}
                 disabled={isPending}
