@@ -11,6 +11,9 @@ function toFriendlyError(error: AuthError): ErrorResult {
   if (error.name === 'AuthRetryableFetchError' || error.status === 500) {
     return { error: '이메일 전송에 실패했어요', code: 'EMAIL_SEND_FAILED' }
   }
+  if (error.message?.includes('Unable to validate email address')) {
+    return { error: '올바른 이메일 형식이 아니에요' }
+  }
   if (!error.message || error.message === '{}') {
     return { error: '알 수 없는 오류가 발생했어요. 잠시 후 다시 시도해주세요' }
   }
