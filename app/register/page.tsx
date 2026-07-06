@@ -61,7 +61,7 @@ export default function RegisterPage() {
     <>
       <Header backHref="/login" />
       <main className="min-h-[calc(100vh-3.5rem)] flex items-center justify-center px-4">
-      <div className="w-full max-w-md flex flex-col gap-5">
+      <div className="w-full max-w-md bg-white rounded-2xl p-8 flex flex-col gap-5">
         <div className="text-center mb-2">
           <div className="text-4xl mb-2">🎂</div>
           <h1 className="text-2xl font-bold text-gray-900">회원가입</h1>
