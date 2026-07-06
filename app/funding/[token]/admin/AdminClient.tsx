@@ -9,7 +9,6 @@ import SettleButton from "@/components/funding/SettleButton";
 import { formatKRW } from "@/lib/utils";
 import { deleteFunding } from "./actions";
 import type { Funding, Payment } from "@/lib/supabase/types";
-import { signOut } from "@/app/login/actions";
 
 // TODO: 실제 데이터 연결 후 제거
 const MOCK_PAYMENTS: Payment[] = [
@@ -71,13 +70,6 @@ export default function AdminClient({
       ? totalAmount
       : MOCK_PAYMENTS.reduce((s, p) => s + p.amount, 0);
 
-  const handleSignOut = () => {
-    startTransition(async () => {
-      await signOut();
-      router.push("/");
-    });
-  };
-
   const handleDelete = () => {
     startTransition(async () => {
       const result = await deleteFunding(funding.share_token);
@@ -91,17 +83,7 @@ export default function AdminClient({
 
   return (
     <>
-      <Header
-        right={
-          <button
-            className="text-sm text-gray-400 hover:underline"
-            onClick={handleSignOut}
-            disabled={isPending}
-          >
-            로그아웃
-          </button>
-        }
-      />
+      <Header />
       <main className="px-4 py-6 flex flex-col gap-5 pb-10">
         <div>
           <p className="text-lg font-semibold text-gray-700">{funding.title}</p>

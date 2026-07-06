@@ -1,16 +1,42 @@
 'use client'
 
+import { useEffect, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
+import { createClient } from '@/lib/supabase/client'
+import { signOut } from '@/app/login/actions'
 
 type Props = {
   backHref?: string
   right?: React.ReactNode
+  hideLogout?: boolean
 }
 
-export default function Header({ backHref, right }: Props) {
+export default function Header({ backHref, right, hideLogout }: Props) {
   const router = useRouter()
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [isPending, startTransition] = useTransition()
+
+  useEffect(() => {
+    const supabase = createClient()
+    supabase.auth.getUser().then(({ data }) => setIsLoggedIn(!!data.user))
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsLoggedIn(!!session?.user)
+    })
+    return () => subscription.unsubscribe()
+  }, [])
+
+  const handleSignOut = () => {
+    startTransition(async () => {
+      await signOut()
+      router.push('/')
+      router.refresh()
+    })
+  }
 
   return (
     <header className="sticky top-0 z-10 bg-white/90 backdrop-blur-sm border-b border-gray-100">
@@ -35,7 +61,20 @@ export default function Header({ backHref, right }: Props) {
           <Image src="/images/logo.svg" alt="모아모아" width={80} height={28} priority />
         </Link>
 
-        {right && <div className="flex items-center gap-2">{right}</div>}
+        {(right || (isLoggedIn && !hideLogout)) && (
+          <div className="flex items-center gap-2">
+            {right}
+            {isLoggedIn && !hideLogout && (
+              <button
+                onClick={handleSignOut}
+                disabled={isPending}
+                className="text-sm text-gray-400 hover:underline disabled:opacity-40"
+              >
+                로그아웃
+              </button>
+            )}
+          </div>
+        )}
       </div>
     </header>
   )

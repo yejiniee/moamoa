@@ -12,7 +12,7 @@ export type Database = {
       fundings: {
         Row: {
           id: string
-          creator_user_id: string
+          creator_user_id: string | null
           title: string
           description: string | null
           image_url: string | null
@@ -34,7 +34,7 @@ export type Database = {
         }
         Update: {
           id?: string
-          creator_user_id?: string
+          creator_user_id?: string | null
           title?: string
           description?: string | null
           image_url?: string | null

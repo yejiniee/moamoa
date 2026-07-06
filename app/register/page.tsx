@@ -8,6 +8,8 @@ import Input from '@/components/ui/Input'
 import Header from '@/components/ui/Header'
 import { sendSignUpOtp, verifyOtpAndSetPassword } from './actions'
 
+const PASSWORD_PATTERN = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[^A-Za-z0-9]).{6,}$/
+
 export default function RegisterPage() {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
@@ -16,17 +18,29 @@ export default function RegisterPage() {
   const [password, setPassword] = useState('')
   const [passwordConfirm, setPasswordConfirm] = useState('')
   const [otp, setOtp] = useState('')
+  const [emailError, setEmailError] = useState('')
+  const [emailSendFailed, setEmailSendFailed] = useState(false)
+  const [showFailModal, setShowFailModal] = useState(false)
+  const [passwordError, setPasswordError] = useState('')
   const [error, setError] = useState('')
 
   const handleSendOtp = () => {
-    if (!email) return setError('이메일을 입력해주세요')
-    if (password.length < 6) return setError('비밀번호는 6자 이상이어야 해요')
-    if (password !== passwordConfirm) return setError('비밀번호가 일치하지 않아요')
+    setEmailError('')
+    setEmailSendFailed(false)
+    setPasswordError('')
     setError('')
+    if (!email) return setEmailError('이메일을 입력해주세요')
+    if (!PASSWORD_PATTERN.test(password)) {
+      return setPasswordError('영문, 숫자, 특수문자를 모두 포함해주세요')
+    }
+    if (password !== passwordConfirm) return setError('비밀번호가 일치하지 않아요')
 
     startTransition(async () => {
       const result = await sendSignUpOtp(email)
-      if ('error' in result) return setError(result.error)
+      if ('error' in result) {
+        if (result.code === 'EMAIL_SEND_FAILED') return setEmailSendFailed(true)
+        return setEmailError(result.error)
+      }
       setStep(2)
     })
   }
@@ -47,7 +61,7 @@ export default function RegisterPage() {
     <>
       <Header backHref="/login" />
       <main className="min-h-[calc(100vh-3.5rem)] flex items-center justify-center px-4">
-      <div className="w-full max-w-md flex flex-col gap-5">
+      <div className="w-full max-w-md bg-white rounded-2xl p-8 flex flex-col gap-5">
         <div className="text-center mb-2">
           <div className="text-4xl mb-2">🎂</div>
           <h1 className="text-2xl font-bold text-gray-900">회원가입</h1>
@@ -70,13 +84,30 @@ export default function RegisterPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="example@email.com"
+              error={
+                emailSendFailed ? (
+                  <>
+                    이메일 전송에 실패했어요.{' '}
+                    <button
+                      type="button"
+                      onClick={() => setShowFailModal(true)}
+                      className="underline font-medium"
+                    >
+                      자세히보기
+                    </button>
+                  </>
+                ) : (
+                  emailError
+                )
+              }
             />
             <Input
               label="비밀번호"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="6자 이상"
+              placeholder="영문, 숫자, 특수문자 포함 6자 이상"
+              error={passwordError}
             />
             <Input
               label="비밀번호 확인"
@@ -107,7 +138,7 @@ export default function RegisterPage() {
             </Button>
             <button
               className="text-sm text-gray-400 hover:underline"
-              onClick={() => { setStep(1); setError('') }}
+              onClick={() => { setStep(1); setError(''); setEmailError(''); setEmailSendFailed(false); setPasswordError('') }}
             >
               이메일 다시 입력
             </button>
@@ -122,6 +153,41 @@ export default function RegisterPage() {
         </p>
       </div>
       </main>
+
+      {showFailModal && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 px-4">
+          <div className="bg-white rounded-2xl p-6 w-full max-w-md flex flex-col gap-4">
+            <div className="text-center">
+              <p className="text-lg font-bold text-gray-900">지금은 회원가입이 어려워요</p>
+              <p className="text-sm text-gray-500 mt-2 leading-relaxed">
+                아래 테스트 계정으로 로그인해서 이용해주세요.
+              </p>
+            </div>
+            <div className="bg-gray-50 rounded-xl p-4 flex flex-col gap-2 text-sm">
+              <div className="flex justify-between">
+                <span className="text-gray-400">아이디</span>
+                <span className="font-semibold text-gray-900">yjcho0011@gmail.com</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-400">비밀번호</span>
+                <span className="font-semibold text-gray-900">qwer1234!</span>
+              </div>
+            </div>
+            <Link
+              href="/login"
+              className="h-[52px] rounded-xl bg-rose-500 text-white text-sm font-semibold flex items-center justify-center"
+            >
+              로그인하러 가기
+            </Link>
+            <button
+              onClick={() => setShowFailModal(false)}
+              className="text-sm text-gray-400"
+            >
+              닫기
+            </button>
+          </div>
+        </div>
+      )}
     </>
   )
 }
