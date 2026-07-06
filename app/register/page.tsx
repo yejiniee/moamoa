@@ -19,11 +19,14 @@ export default function RegisterPage() {
   const [passwordConfirm, setPasswordConfirm] = useState('')
   const [otp, setOtp] = useState('')
   const [emailError, setEmailError] = useState('')
+  const [emailSendFailed, setEmailSendFailed] = useState(false)
+  const [showFailModal, setShowFailModal] = useState(false)
   const [passwordError, setPasswordError] = useState('')
   const [error, setError] = useState('')
 
   const handleSendOtp = () => {
     setEmailError('')
+    setEmailSendFailed(false)
     setPasswordError('')
     setError('')
     if (!email) return setEmailError('이메일을 입력해주세요')
@@ -34,7 +37,10 @@ export default function RegisterPage() {
 
     startTransition(async () => {
       const result = await sendSignUpOtp(email)
-      if ('error' in result) return setEmailError(result.error)
+      if ('error' in result) {
+        if (result.code === 'EMAIL_SEND_FAILED') return setEmailSendFailed(true)
+        return setEmailError(result.error)
+      }
       setStep(2)
     })
   }
@@ -78,7 +84,22 @@ export default function RegisterPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="example@email.com"
-              error={emailError}
+              error={
+                emailSendFailed ? (
+                  <>
+                    이메일 전송에 실패했어요.{' '}
+                    <button
+                      type="button"
+                      onClick={() => setShowFailModal(true)}
+                      className="underline font-medium"
+                    >
+                      자세히보기
+                    </button>
+                  </>
+                ) : (
+                  emailError
+                )
+              }
             />
             <Input
               label="비밀번호"
@@ -117,7 +138,7 @@ export default function RegisterPage() {
             </Button>
             <button
               className="text-sm text-gray-400 hover:underline"
-              onClick={() => { setStep(1); setError(''); setEmailError(''); setPasswordError('') }}
+              onClick={() => { setStep(1); setError(''); setEmailError(''); setEmailSendFailed(false); setPasswordError('') }}
             >
               이메일 다시 입력
             </button>
@@ -132,6 +153,43 @@ export default function RegisterPage() {
         </p>
       </div>
       </main>
+
+      {showFailModal && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 px-4">
+          <div className="bg-white rounded-2xl p-6 w-full max-w-md flex flex-col gap-4">
+            <div className="text-center">
+              <p className="text-lg font-bold text-gray-900">지금은 회원가입이 어려워요</p>
+              <p className="text-sm text-gray-500 mt-2 leading-relaxed">
+                서비스 준비 중이라 아무 이메일로나 인증 메일을 보낼 수 없어요.
+                <br />
+                아래 테스트 계정으로 로그인해서 이용해주세요.
+              </p>
+            </div>
+            <div className="bg-gray-50 rounded-xl p-4 flex flex-col gap-2 text-sm">
+              <div className="flex justify-between">
+                <span className="text-gray-400">아이디</span>
+                <span className="font-semibold text-gray-900">yjcho0011@gmail.com</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-400">비밀번호</span>
+                <span className="font-semibold text-gray-900">qwer1234!</span>
+              </div>
+            </div>
+            <Link
+              href="/login"
+              className="h-[52px] rounded-xl bg-rose-500 text-white text-sm font-semibold flex items-center justify-center"
+            >
+              로그인하러 가기
+            </Link>
+            <button
+              onClick={() => setShowFailModal(false)}
+              className="text-sm text-gray-400"
+            >
+              닫기
+            </button>
+          </div>
+        </div>
+      )}
     </>
   )
 }

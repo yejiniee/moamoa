@@ -4,7 +4,7 @@ import { useId, useState } from 'react'
 
 type InputProps = React.InputHTMLAttributes<HTMLInputElement> & {
   label?: React.ReactNode
-  error?: string
+  error?: React.ReactNode
   hint?: string
 }
 
