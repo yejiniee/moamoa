@@ -16,17 +16,19 @@ export default function RegisterPage() {
   const [password, setPassword] = useState('')
   const [passwordConfirm, setPasswordConfirm] = useState('')
   const [otp, setOtp] = useState('')
+  const [emailError, setEmailError] = useState('')
   const [error, setError] = useState('')
 
   const handleSendOtp = () => {
-    if (!email) return setError('이메일을 입력해주세요')
+    setEmailError('')
+    setError('')
+    if (!email) return setEmailError('이메일을 입력해주세요')
     if (password.length < 6) return setError('비밀번호는 6자 이상이어야 해요')
     if (password !== passwordConfirm) return setError('비밀번호가 일치하지 않아요')
-    setError('')
 
     startTransition(async () => {
       const result = await sendSignUpOtp(email)
-      if ('error' in result) return setError(result.error)
+      if ('error' in result) return setEmailError(result.error)
       setStep(2)
     })
   }
@@ -70,6 +72,7 @@ export default function RegisterPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="example@email.com"
+              error={emailError}
             />
             <Input
               label="비밀번호"
@@ -107,7 +110,7 @@ export default function RegisterPage() {
             </Button>
             <button
               className="text-sm text-gray-400 hover:underline"
-              onClick={() => { setStep(1); setError('') }}
+              onClick={() => { setStep(1); setError(''); setEmailError('') }}
             >
               이메일 다시 입력
             </button>

@@ -17,7 +17,27 @@ function toFriendlyMessage(error: AuthError): string {
   return error.message
 }
 
+async function isEmailRegistered(email: string): Promise<boolean> {
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_SUPABASE_URL}/auth/v1/admin/users?filter=${encodeURIComponent(email)}`,
+    {
+      headers: {
+        apikey: process.env.SUPABASE_SERVICE_ROLE_KEY!,
+        Authorization: `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`,
+      },
+      cache: 'no-store',
+    }
+  )
+  if (!res.ok) return false
+  const data: { users?: { email?: string }[] } = await res.json()
+  return (data.users ?? []).some((u) => u.email?.toLowerCase() === email.toLowerCase())
+}
+
 export async function sendSignUpOtp(email: string): Promise<AuthResult> {
+  if (await isEmailRegistered(email)) {
+    return { error: '이미 가입된 이메일이에요.' } as ErrorResult
+  }
+
   const supabase = await createServerSupabaseClient()
   const { error } = await supabase.auth.signInWithOtp({
     email,
