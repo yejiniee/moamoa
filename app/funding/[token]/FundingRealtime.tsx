@@ -7,56 +7,6 @@ import FundingProgress from "@/components/funding/FundingProgress";
 import DonorRolling from "@/components/funding/DonorRolling";
 import type { Gift, Payment } from "@/lib/supabase/types";
 
-const MOCK_PAYMENTS: Payment[] =
-  process.env.NODE_ENV === "development"
-    ? [
-        {
-          id: "mock-1",
-          funding_id: "",
-          participant_name: "김민준",
-          message: "생일 축하해!",
-          amount: 30000,
-          order_id: "mock-1",
-          payment_key: null,
-          status: "confirmed",
-          created_at: "",
-        },
-        {
-          id: "mock-2",
-          funding_id: "",
-          participant_name: "이서연",
-          message: "항상 응원할게요 :)",
-          amount: 50000,
-          order_id: "mock-2",
-          payment_key: null,
-          status: "confirmed",
-          created_at: "",
-        },
-        {
-          id: "mock-3",
-          funding_id: "",
-          participant_name: "박지호",
-          message: null,
-          amount: 20000,
-          order_id: "mock-3",
-          payment_key: null,
-          status: "confirmed",
-          created_at: "",
-        },
-        {
-          id: "mock-4",
-          funding_id: "",
-          participant_name: "최아름",
-          message: "많이많이 받아!",
-          amount: 100000,
-          order_id: "mock-4",
-          payment_key: null,
-          status: "confirmed",
-          created_at: "",
-        },
-      ]
-    : [];
-
 type Props = {
   fundingId: string;
   imageUrl: string | null;
@@ -72,9 +22,8 @@ export default function FundingRealtime({
   gifts,
   initialPayments,
 }: Props) {
-  const effectiveInitial =
-    initialPayments.length === 0 ? MOCK_PAYMENTS : initialPayments;
-  const [payments, setPayments] = useState<Payment[]>(effectiveInitial);
+  const [payments, setPayments] = useState<Payment[]>(initialPayments);
+  const [showLightbox, setShowLightbox] = useState(false);
 
   const totalGoal = gifts.reduce((sum, g) => sum + g.target_amount, 0);
   const totalRaised = payments.reduce((sum, p) => sum + p.amount, 0);
@@ -123,7 +72,10 @@ export default function FundingRealtime({
     <>
       {/* 이미지 + DonorRolling 오버레이 */}
       <div className="relative w-full">
-        <div className="relative w-full aspect-[4/3] rounded-2xl overflow-hidden bg-gray-100 shadow-sm">
+        <div
+          className={`relative w-full aspect-[4/3] rounded-2xl overflow-hidden bg-gray-100 shadow-sm ${imageUrl ? "cursor-zoom-in" : ""}`}
+          onClick={() => imageUrl && setShowLightbox(true)}
+        >
           {imageUrl ? (
             <Image
               src={imageUrl}
@@ -161,6 +113,33 @@ export default function FundingRealtime({
       <div className="mt-4">
         <FundingProgress totalRaised={totalRaised} totalGoal={totalGoal} />
       </div>
+
+      {showLightbox && imageUrl && (
+        <div
+          className="fixed inset-0 bg-black/90 flex items-center justify-center z-50 px-4"
+          onClick={() => setShowLightbox(false)}
+        >
+          <button
+            className="absolute top-4 right-4 text-white/80 hover:text-white"
+            onClick={() => setShowLightbox(false)}
+            aria-label="닫기"
+          >
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+          <div className="relative w-full max-w-2xl aspect-square">
+            <Image
+              src={imageUrl}
+              alt={title}
+              fill
+              className="object-contain"
+              sizes="100vw"
+            />
+          </div>
+        </div>
+      )}
     </>
   );
 }

@@ -11,7 +11,7 @@ export default function ProgressBar({ percent, size = 'sm', className = '' }: Pr
   return (
     <div className={`w-full rounded-full bg-gray-100 overflow-hidden ${heights[size]} ${className}`}>
       <div
-        className="h-full rounded-full bg-rose-500 transition-all duration-500 ease-out"
+        className="h-full rounded-full bg-rose-500"
         style={{ width: `${clamped}%` }}
         role="progressbar"
         aria-valuenow={clamped}
