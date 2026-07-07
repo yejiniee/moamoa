@@ -61,12 +61,13 @@ export default async function FundingFeedPage() {
         </div>
       ) : (
         <div className="grid grid-cols-2 gap-3">
-          {list.map((funding) => (
+          {list.map((funding, index) => (
             <FundingCard
               key={funding.id}
               funding={funding}
               totalRaised={raisedMap[funding.id] ?? 0}
               totalTarget={targetMap[funding.id] ?? 0}
+              priority={index < 2}
             />
           ))}
         </div>

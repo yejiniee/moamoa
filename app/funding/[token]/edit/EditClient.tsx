@@ -100,6 +100,7 @@ export default function EditClient({ token, funding, gift }: Props) {
                   src={imagePreview}
                   alt="미리보기"
                   fill
+                  sizes="(min-width: 430px) 400px, 100vw"
                   className="object-cover"
                 />
               ) : (
