@@ -10,6 +10,11 @@ function readManifest() {
   return JSON.parse(raw)
 }
 
+function kstTimestamp() {
+  const kst = new Date(Date.now() + 9 * 60 * 60 * 1000)
+  return kst.toISOString().replace('Z', '+09:00')
+}
+
 function pickMetrics(lhr) {
   const audits = lhr.audits
   return {
@@ -40,7 +45,7 @@ async function main() {
       const lhr = JSON.parse(readFileSync(run.jsonPath, 'utf-8'))
       const metrics = pickMetrics(lhr)
       rows.push({
-        timestamp: new Date().toISOString(),
+        timestamp: kstTimestamp(),
         commit: (process.env.GITHUB_SHA ?? '').slice(0, 7),
         branch: process.env.BRANCH || process.env.GITHUB_REF_NAME || '',
         url: run.url,
