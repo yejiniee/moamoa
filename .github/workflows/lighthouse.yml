@@ -1,0 +1,82 @@
+name: Lighthouse Performance Tracking
+
+on:
+  deployment_status:
+  workflow_dispatch:
+    inputs:
+      url:
+        description: '측정할 URL (비워두면 저장된 프로덕션 URL 사용)'
+        required: false
+
+jobs:
+  lighthouse:
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.deployment_status.state == 'success' &&
+        github.event.deployment_status.environment == 'Production')
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        device: [mobile, desktop]
+    steps:
+      - name: Resolve target URLs
+        id: target
+        run: |
+          if [ -n "${{ github.event.inputs.url }}" ]; then
+            BASE="${{ github.event.inputs.url }}"
+          elif [ -n "${{ github.event.deployment_status.environment_url }}" ]; then
+            BASE="${{ github.event.deployment_status.environment_url }}"
+          else
+            BASE="${{ secrets.PRODUCTION_URL }}"
+          fi
+          BASE="${BASE%/}"
+          TOKEN="${{ secrets.SAMPLE_FUNDING_TOKEN }}"
+          TOKEN="${TOKEN:-sample}"
+          {
+            echo "urls<<EOF"
+            echo "$BASE/"
+            echo "$BASE/login"
+            echo "$BASE/register"
+            echo "$BASE/create"
+            echo "$BASE/funding"
+            echo "$BASE/funding/$TOKEN"
+            echo "$BASE/funding/$TOKEN/admin"
+            echo "$BASE/funding/$TOKEN/edit"
+            echo "$BASE/funding/$TOKEN/pay"
+            echo "$BASE/payment/success"
+            echo "$BASE/payment/fail"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Lighthouse CI (${{ matrix.device }})
+        id: lighthouse
+        uses: treosh/lighthouse-ci-action@v11
+        env:
+          LHCI_TEST_EMAIL: ${{ secrets.LHCI_TEST_EMAIL }}
+          LHCI_TEST_PASSWORD: ${{ secrets.LHCI_TEST_PASSWORD }}
+        with:
+          urls: ${{ steps.target.outputs.urls }}
+          configPath: ./.lighthouserc.${{ matrix.device }}.js
+          uploadArtifacts: false
+          temporaryPublicStorage: false
+
+      - name: Record results to Google Sheet
+        env:
+          DEVICE: ${{ matrix.device }}
+          BRANCH: ${{ github.event.deployment.ref || github.ref_name }}
+          LHCI_MANIFEST: ${{ steps.lighthouse.outputs.manifest }}
+          GOOGLE_SERVICE_ACCOUNT_EMAIL: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_EMAIL }}
+          GOOGLE_PRIVATE_KEY: ${{ secrets.GOOGLE_PRIVATE_KEY }}
+          GOOGLE_SHEET_ID: ${{ secrets.GOOGLE_SHEET_ID }}
+        run: node scripts/lighthouse-to-sheet.mjs
