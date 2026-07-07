@@ -26,11 +26,21 @@ jobs:
             BASE="${{ secrets.PRODUCTION_URL }}"
           fi
           BASE="${BASE%/}"
+          TOKEN="${{ secrets.SAMPLE_FUNDING_TOKEN }}"
+          TOKEN="${TOKEN:-sample}"
           {
             echo "urls<<EOF"
             echo "$BASE/"
             echo "$BASE/login"
             echo "$BASE/register"
+            echo "$BASE/create"
+            echo "$BASE/funding"
+            echo "$BASE/funding/$TOKEN"
+            echo "$BASE/funding/$TOKEN/admin"
+            echo "$BASE/funding/$TOKEN/edit"
+            echo "$BASE/funding/$TOKEN/pay"
+            echo "$BASE/payment/success"
+            echo "$BASE/payment/fail"
             echo "EOF"
           } >> "$GITHUB_OUTPUT"
 
