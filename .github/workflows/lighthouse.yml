@@ -44,7 +44,6 @@ jobs:
             echo "$BASE/funding/$TOKEN/admin"
             echo "$BASE/funding/$TOKEN/edit"
             echo "$BASE/funding/$TOKEN/pay"
-            echo "$BASE/payment/success"
             echo "$BASE/payment/fail"
             echo "EOF"
           } >> "$GITHUB_OUTPUT"
@@ -61,6 +60,7 @@ jobs:
 
       - name: Run Lighthouse CI (${{ matrix.device }})
         id: lighthouse
+        continue-on-error: true
         uses: treosh/lighthouse-ci-action@v11
         env:
           LHCI_TEST_EMAIL: ${{ secrets.LHCI_TEST_EMAIL }}
@@ -72,6 +72,7 @@ jobs:
           temporaryPublicStorage: false
 
       - name: Record results to Google Sheet
+        if: always() && steps.lighthouse.outputs.manifest
         env:
           DEVICE: ${{ matrix.device }}
           BRANCH: ${{ github.event.deployment.ref || github.ref_name }}

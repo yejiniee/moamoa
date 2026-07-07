@@ -30,23 +30,32 @@ async function main() {
   const manifest = readManifest()
   const representative = manifest.filter((run) => run.isRepresentativeRun !== false)
 
-  const rows = representative.map((run) => {
-    const lhr = JSON.parse(readFileSync(run.jsonPath, 'utf-8'))
-    const metrics = pickMetrics(lhr)
-    return {
-      timestamp: new Date().toISOString(),
-      commit: (process.env.GITHUB_SHA ?? '').slice(0, 7),
-      branch: process.env.BRANCH || process.env.GITHUB_REF_NAME || '',
-      url: run.url,
-      device: process.env.DEVICE ?? 'mobile',
-      performance: metrics.performance,
-      fcp_ms: metrics.fcpMs,
-      lcp_ms: metrics.lcpMs,
-      tbt_ms: metrics.tbtMs,
-      cls: metrics.cls,
-      speed_index_ms: metrics.speedIndexMs,
+  const rows = []
+  for (const run of representative) {
+    if (!run.jsonPath) {
+      console.warn(`[lighthouse-to-sheet] ${run.url}는 리포트가 없어 건너뜁니다 (측정 실패)`)
+      continue
     }
-  })
+    try {
+      const lhr = JSON.parse(readFileSync(run.jsonPath, 'utf-8'))
+      const metrics = pickMetrics(lhr)
+      rows.push({
+        timestamp: new Date().toISOString(),
+        commit: (process.env.GITHUB_SHA ?? '').slice(0, 7),
+        branch: process.env.BRANCH || process.env.GITHUB_REF_NAME || '',
+        url: run.url,
+        device: process.env.DEVICE ?? 'mobile',
+        performance: metrics.performance,
+        fcp_ms: metrics.fcpMs,
+        lcp_ms: metrics.lcpMs,
+        tbt_ms: metrics.tbtMs,
+        cls: metrics.cls,
+        speed_index_ms: metrics.speedIndexMs,
+      })
+    } catch (err) {
+      console.warn(`[lighthouse-to-sheet] ${run.url} 결과 처리 실패, 건너뜁니다:`, err.message)
+    }
+  }
 
   if (rows.length === 0) {
     console.log('기록할 Lighthouse 결과가 없습니다')
