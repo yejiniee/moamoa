@@ -48,6 +48,21 @@ module.exports = async (browser, context) => {
     }
   } catch (err) {
     console.warn('[lighthouse-login] 로그인 실패, 익명 상태로 계속 진행합니다:', err.message)
+    try {
+      const debugInfo = await page.evaluate(() => ({
+        url: window.location.href,
+        title: document.title,
+        inputs: Array.from(document.querySelectorAll('input')).map((el) => ({
+          type: el.type,
+          name: el.name,
+          id: el.id,
+        })),
+        bodySnippet: document.body?.innerText?.slice(0, 300) ?? '',
+      }))
+      console.warn('[lighthouse-login] 실패 시점 페이지 상태:', JSON.stringify(debugInfo))
+    } catch (debugErr) {
+      console.warn('[lighthouse-login] 디버그 정보 수집도 실패:', debugErr.message)
+    }
   } finally {
     await page.close()
   }
