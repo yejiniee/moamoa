@@ -12,7 +12,8 @@ jobs:
   lighthouse:
     if: |
       github.event_name == 'workflow_dispatch' ||
-      github.event.deployment_status.state == 'success'
+      (github.event.deployment_status.state == 'success' &&
+        github.event.deployment_status.environment == 'Production')
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
