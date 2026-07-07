@@ -36,8 +36,9 @@ async function main() {
     return {
       timestamp: new Date().toISOString(),
       commit: (process.env.GITHUB_SHA ?? '').slice(0, 7),
-      branch: process.env.GITHUB_REF_NAME ?? '',
+      branch: process.env.BRANCH || process.env.GITHUB_REF_NAME || '',
       url: run.url,
+      device: process.env.DEVICE ?? 'mobile',
       performance: metrics.performance,
       fcp_ms: metrics.fcpMs,
       lcp_ms: metrics.lcpMs,
@@ -63,9 +64,9 @@ async function main() {
   const sheet = doc.sheetsByIndex[0]
   await sheet.addRows(rows)
 
-  console.log(`${rows.length}개 행을 "${sheet.title}" 시트에 기록했습니다`)
+  console.log(`${rows.length}개 행을 "${sheet.title}" 시트에 기록했습니다 (branch=${rows[0].branch}, commit=${rows[0].commit})`)
   for (const row of rows) {
-    console.log(`  - ${row.url}: performance=${row.performance}, LCP=${row.lcp_ms}ms, CLS=${row.cls}`)
+    console.log(`  - [${row.device}] ${row.url}: performance=${row.performance}, LCP=${row.lcp_ms}ms, CLS=${row.cls}`)
   }
 }
 
