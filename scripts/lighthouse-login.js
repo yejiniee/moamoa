@@ -22,8 +22,18 @@ module.exports = async (browser, context) => {
     await page.goto(`${origin}/login`, { waitUntil: 'networkidle0', timeout: 30000 })
 
     if (new URL(page.url()).pathname === '/login') {
+      // page.type()은 셀렉터를 기다려주지 않고 즉시 조회하기 때문에,
+      // 각 입력 전에 명시적으로 waitForSelector로 실제 등장을 기다린다.
+      await page.waitForSelector('input[type="email"]', { visible: true, timeout: 15000 })
       await page.type('input[type="email"]', email, { delay: 20 })
+
+      await page.waitForSelector('input[type="password"]', { visible: true, timeout: 15000 })
       await page.type('input[type="password"]', password, { delay: 20 })
+
+      await page.waitForFunction(
+        () => Array.from(document.querySelectorAll('button')).some((b) => b.textContent.trim() === '로그인'),
+        { timeout: 15000 }
+      )
 
       await Promise.all([
         page.waitForNavigation({ waitUntil: 'networkidle0', timeout: 30000 }),
