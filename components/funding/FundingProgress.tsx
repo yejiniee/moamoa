@@ -54,7 +54,7 @@ export default function FundingProgress({ totalRaised, totalGoal }: Props) {
           {formatKRW(totalGoal)} 목표
         </span>
       </div>
-      <ProgressBar percent={animatedPercent} size="md" />
+      <ProgressBar percent={animatedPercent} size="md" instant />
       <p className="text-sm text-gray-700">
         <span className="font-semibold text-gray-900">
           {formatKRW(totalRaised)}
