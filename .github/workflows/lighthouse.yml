@@ -15,6 +15,7 @@ jobs:
       github.event.deployment_status.state == 'success'
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         device: [mobile, desktop]
     steps:
