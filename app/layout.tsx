@@ -4,10 +4,15 @@ import KakaoInit from "@/components/KakaoInit";
 import "./globals.css";
 
 const pretendard = localFont({
-  src: "./fonts/PretendardVariable.woff2",
-  weight: "45 920",
+  src: [
+    { path: "./fonts/Pretendard-Regular.woff2", weight: "400", style: "normal" },
+    { path: "./fonts/Pretendard-Medium.woff2", weight: "500", style: "normal" },
+    { path: "./fonts/Pretendard-SemiBold.woff2", weight: "600", style: "normal" },
+    { path: "./fonts/Pretendard-Bold.woff2", weight: "700", style: "normal" },
+  ],
   variable: "--font-pretendard",
   display: "swap",
+  preload: false,
 });
 
 export const metadata: Metadata = {
