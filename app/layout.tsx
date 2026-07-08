@@ -1,19 +1,6 @@
 import type { Metadata } from "next";
-import localFont from "next/font/local";
 import KakaoInit from "@/components/KakaoInit";
 import "./globals.css";
-
-const pretendard = localFont({
-  src: [
-    { path: "./fonts/Pretendard-Regular.woff2", weight: "400", style: "normal" },
-    { path: "./fonts/Pretendard-Medium.woff2", weight: "500", style: "normal" },
-    { path: "./fonts/Pretendard-SemiBold.woff2", weight: "600", style: "normal" },
-    { path: "./fonts/Pretendard-Bold.woff2", weight: "700", style: "normal" },
-  ],
-  variable: "--font-pretendard",
-  display: "swap",
-  preload: false,
-});
 
 export const metadata: Metadata = {
   title: "모아모아 — 생일선물 펀딩",
@@ -26,7 +13,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="ko" className={pretendard.variable}>
+    <html lang="ko">
       <body className="min-h-screen antialiased sm:bg-[#f2f3f5]">
         <div className="min-h-screen w-full bg-[var(--color-bg)] sm:max-w-[430px] sm:mx-auto">
           {children}
