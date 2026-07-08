@@ -58,7 +58,7 @@ export default function Header({ backHref, right, hideLogout }: Props) {
           href="/"
           className="absolute left-1/2 -translate-x-1/2 hover:opacity-80 transition-opacity"
         >
-          <Image src="/images/logo.svg" alt="모아모아" width={80} height={28} priority />
+          <Image src="/images/logo.svg" alt="모아모아" width={80} height={28} priority className="w-20 h-7" />
         </Link>
 
         {(right || (isLoggedIn && !hideLogout)) && (

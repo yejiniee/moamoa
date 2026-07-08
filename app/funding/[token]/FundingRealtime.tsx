@@ -81,6 +81,7 @@ export default function FundingRealtime({
               src={imageUrl}
               alt={title}
               fill
+              sizes="(min-width: 430px) 430px, 100vw"
               className="object-cover"
               priority
             />

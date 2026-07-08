@@ -8,6 +8,7 @@ type Props = {
   funding: Funding
   totalRaised: number
   totalTarget: number
+  priority?: boolean
 }
 
 function calcDday(endDate: string): string {
@@ -17,7 +18,7 @@ function calcDday(endDate: string): string {
   return `D-${diff}`
 }
 
-export default function FundingCard({ funding, totalRaised, totalTarget }: Props) {
+export default function FundingCard({ funding, totalRaised, totalTarget, priority = false }: Props) {
   const percent = calcPercent(totalRaised, totalTarget)
   const dday = calcDday(funding.end_date)
   const isClosed = funding.status === 'closed'
@@ -27,7 +28,7 @@ export default function FundingCard({ funding, totalRaised, totalTarget }: Props
       <div className={`bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-md transition-shadow ${isClosed ? 'opacity-50 grayscale' : ''}`}>
         <div className="relative h-40 bg-gray-100">
           {funding.image_url ? (
-            <Image src={funding.image_url} alt={funding.title} fill className="object-cover" />
+            <Image src={funding.image_url} alt={funding.title} fill sizes="(min-width: 430px) 215px, 50vw" className="object-cover" priority={priority} />
           ) : (
             <div className="flex items-center justify-center h-full bg-gray-100">
               <Image src="/images/ic-birthday-cake.svg" alt="기본 이미지" width={72} height={72} style={{ filter: 'brightness(0) invert(78%)' }} />

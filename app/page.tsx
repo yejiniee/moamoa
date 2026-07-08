@@ -28,6 +28,7 @@ export default async function LandingPage() {
                 width={120}
                 height={40}
                 priority
+                className="w-[120px] h-[40px]"
               />
             </div>
             <p className="text-[16px] text-gray-500 leading-relaxed">
