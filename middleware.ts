@@ -42,7 +42,14 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  return supabaseResponse;
+  // 미들웨어에서 이미 검증한 사용자 id를 요청 헤더로 전달해,
+  // 페이지 컴포넌트가 auth.getUser()를 중복 호출하지 않도록 한다.
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set("x-user-id", user?.id ?? "");
+  const response = NextResponse.next({ request: { headers: requestHeaders } });
+  supabaseResponse.cookies.getAll().forEach((cookie) => response.cookies.set(cookie));
+
+  return response;
 }
 
 export const config = {

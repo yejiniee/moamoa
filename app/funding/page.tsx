@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { headers } from 'next/headers'
 import { createClient } from '@/lib/supabase/server'
 import FundingCard from '@/components/funding/FundingCard'
 import Button from '@/components/ui/Button'
@@ -7,12 +8,14 @@ import Header from '@/components/ui/Header'
 export default async function FundingFeedPage() {
   const supabase = await createClient()
 
-  const { data: { user } } = await supabase.auth.getUser()
+  // 미들웨어가 이미 auth.getUser()로 검증한 id를 헤더로 전달받아,
+  // 같은 요청 안에서 인증 검증 네트워크 호출이 중복되지 않도록 한다.
+  const userId = (await headers()).get('x-user-id') ?? ''
 
   const { data: fundings } = await supabase
     .from('fundings')
     .select('*')
-    .eq('creator_user_id', user?.id ?? '')
+    .eq('creator_user_id', userId)
     .order('status', { ascending: true })
     .order('created_at', { ascending: false })
 
