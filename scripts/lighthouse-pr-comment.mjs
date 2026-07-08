@@ -21,10 +21,10 @@ for (const row of rows) {
   ;(byDevice[row.device] ??= []).push(row)
 }
 
-let body = '## 🔦 Lighthouse: main vs 이 브랜치 (개발환경 CI 빌드 기준)\n\n'
+let body = '## 🔦 Lighthouse: main vs PR 브랜치 (개발환경 CI 빌드 기준)\n\n'
 body +=
-  '같은 GitHub Actions 러너에서 main과 이 브랜치를 각각 빌드/서빙해 동일한 조건으로 측정한 결과입니다. ' +
-  '실제 배포(Vercel) 환경과는 절대값이 다를 수 있지만, 이 브랜치가 main 대비 성능을 얼마나 바꿨는지는 이 표로 판단할 수 있습니다.\n\n'
+  '같은 GitHub Actions 러너에서 main과 PR 브랜치를 각각 빌드/서빙해 동일한 조건으로 측정한 결과입니다. ' +
+  '실제 배포(Vercel) 환경과는 절대값이 다를 수 있지만, PR 브랜치가 main 대비 성능을 얼마나 바꿨는지는 이 표로 판단할 수 있습니다.\n\n'
 
 for (const device of ['mobile', 'desktop']) {
   const list = byDevice[device]

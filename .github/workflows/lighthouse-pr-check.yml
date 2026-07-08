@@ -59,16 +59,16 @@ jobs:
             echo "EOF"
           } >> "$GITHUB_OUTPUT"
 
-      - name: 이 브랜치 설치 + 빌드
+      - name: PR 브랜치 설치 + 빌드
         run: npm ci && npm run build
 
-      - name: 이 브랜치 서빙 시작 (4001)
+      - name: PR 브랜치 서빙 시작 (4001)
         run: |
           npm start -- -p 4001 &
           echo $! > branch-server.pid
           npx --yes wait-on http://localhost:4001 -t 60000
 
-      - name: Lighthouse (이 브랜치, mobile)
+      - name: Lighthouse (PR 브랜치, mobile)
         id: branch-mobile
         continue-on-error: true
         uses: treosh/lighthouse-ci-action@v11
@@ -78,7 +78,7 @@ jobs:
           uploadArtifacts: false
           temporaryPublicStorage: false
 
-      - name: Lighthouse (이 브랜치, desktop)
+      - name: Lighthouse (PR 브랜치, desktop)
         id: branch-desktop
         continue-on-error: true
         uses: treosh/lighthouse-ci-action@v11
@@ -88,7 +88,7 @@ jobs:
           uploadArtifacts: false
           temporaryPublicStorage: false
 
-      - name: 이 브랜치 서버 종료
+      - name: PR 브랜치 서버 종료
         if: always()
         run: kill $(cat branch-server.pid) 2>/dev/null || true
 
