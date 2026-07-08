@@ -1,0 +1,158 @@
+name: Lighthouse PR Check
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  compare:
+    runs-on: ubuntu-latest
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      NEXT_PUBLIC_TOSS_CLIENT_KEY: ${{ secrets.NEXT_PUBLIC_TOSS_CLIENT_KEY }}
+      TOSS_SECRET_KEY: ${{ secrets.TOSS_SECRET_KEY }}
+      NEXT_PUBLIC_KAKAO_JS_KEY: ${{ secrets.NEXT_PUBLIC_KAKAO_JS_KEY }}
+      LHCI_TEST_EMAIL: ${{ secrets.LHCI_TEST_EMAIL }}
+      LHCI_TEST_PASSWORD: ${{ secrets.LHCI_TEST_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: 측정 URL 목록 만들기
+        id: target
+        run: |
+          TOKEN="${{ secrets.SAMPLE_FUNDING_TOKEN }}"
+          TOKEN="${TOKEN:-sample}"
+          build_urls() {
+            local BASE="$1"
+            echo "$BASE/"
+            echo "$BASE/login"
+            echo "$BASE/register"
+            echo "$BASE/create"
+            echo "$BASE/funding"
+            echo "$BASE/funding/$TOKEN"
+            echo "$BASE/funding/$TOKEN/admin"
+            echo "$BASE/funding/$TOKEN/edit"
+            echo "$BASE/funding/$TOKEN/pay"
+            echo "$BASE/payment/fail"
+          }
+          {
+            echo "branch_urls<<EOF"
+            build_urls "http://localhost:4001"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+          {
+            echo "main_urls<<EOF"
+            build_urls "http://localhost:4000"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: PR 브랜치 설치 + 빌드
+        run: npm ci && npm run build
+
+      - name: PR 브랜치 서빙 시작 (4001)
+        run: |
+          npm start -- -p 4001 &
+          echo $! > branch-server.pid
+          npx --yes wait-on http://localhost:4001 -t 60000
+
+      - name: Lighthouse (PR 브랜치, mobile)
+        id: branch-mobile
+        continue-on-error: true
+        uses: treosh/lighthouse-ci-action@v11
+        with:
+          urls: ${{ steps.target.outputs.branch_urls }}
+          configPath: ./.lighthouserc.mobile.js
+          uploadArtifacts: false
+          temporaryPublicStorage: false
+
+      - name: Lighthouse (PR 브랜치, desktop)
+        id: branch-desktop
+        continue-on-error: true
+        uses: treosh/lighthouse-ci-action@v11
+        with:
+          urls: ${{ steps.target.outputs.branch_urls }}
+          configPath: ./.lighthouserc.desktop.js
+          uploadArtifacts: false
+          temporaryPublicStorage: false
+
+      - name: PR 브랜치 서버 종료
+        if: always()
+        run: kill $(cat branch-server.pid) 2>/dev/null || true
+
+      - name: main 워크트리 추가 + 빌드
+        run: |
+          git worktree add ../main-src origin/main
+          cd ../main-src && npm ci && npm run build
+
+      - name: main 서빙 시작 (4000)
+        run: |
+          (cd ../main-src && npm start -- -p 4000) &
+          echo $! > main-server.pid
+          npx --yes wait-on http://localhost:4000 -t 60000
+
+      - name: Lighthouse (main, mobile)
+        id: main-mobile
+        continue-on-error: true
+        uses: treosh/lighthouse-ci-action@v11
+        with:
+          urls: ${{ steps.target.outputs.main_urls }}
+          configPath: ./.lighthouserc.mobile.js
+          uploadArtifacts: false
+          temporaryPublicStorage: false
+
+      - name: Lighthouse (main, desktop)
+        id: main-desktop
+        continue-on-error: true
+        uses: treosh/lighthouse-ci-action@v11
+        with:
+          urls: ${{ steps.target.outputs.main_urls }}
+          configPath: ./.lighthouserc.desktop.js
+          uploadArtifacts: false
+          temporaryPublicStorage: false
+
+      - name: main 서버 종료
+        if: always()
+        run: kill $(cat main-server.pid) 2>/dev/null || true
+
+      - name: 결과 비교 (mobile)
+        if: always() && steps.branch-mobile.outputs.manifest && steps.main-mobile.outputs.manifest
+        env:
+          DEVICE: mobile
+          LHCI_MANIFEST_MAIN: ${{ steps.main-mobile.outputs.manifest }}
+          LHCI_MANIFEST_BRANCH: ${{ steps.branch-mobile.outputs.manifest }}
+          OUTPUT_PATH: diff-mobile.json
+        run: node scripts/lighthouse-diff.mjs
+
+      - name: 결과 비교 (desktop)
+        if: always() && steps.branch-desktop.outputs.manifest && steps.main-desktop.outputs.manifest
+        env:
+          DEVICE: desktop
+          LHCI_MANIFEST_MAIN: ${{ steps.main-desktop.outputs.manifest }}
+          LHCI_MANIFEST_BRANCH: ${{ steps.branch-desktop.outputs.manifest }}
+          OUTPUT_PATH: diff-desktop.json
+        run: node scripts/lighthouse-diff.mjs
+
+      - name: PR 코멘트 본문 생성
+        if: always()
+        run: node scripts/lighthouse-pr-comment.mjs . > comment.md
+
+      - name: PR에 코멘트 남기기
+        if: always()
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: lighthouse-pr-check
+          path: comment.md
