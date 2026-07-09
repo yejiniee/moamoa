@@ -27,6 +27,7 @@ export default function EditClient({ token, funding, gift }: Props) {
     funding.image_url,
   );
   const [imageUploading, setImageUploading] = useState(false);
+  const [imageError, setImageError] = useState("");
 
   const [giftTargetAmount, setGiftTargetAmount] = useState(
     Number(gift.target_amount).toLocaleString("ko-KR"),
@@ -45,19 +46,19 @@ export default function EditClient({ token, funding, gift }: Props) {
     if (!file) return;
     setImagePreview(URL.createObjectURL(file));
     setImageUploading(true);
-    setError("");
+    setImageError("");
     const formData = new FormData();
     formData.append("file", file);
     try {
       const result = await uploadFundingImage(formData);
       if ("error" in result) {
-        setError(result.error);
+        setImageError(result.error);
         setImagePreview(funding.image_url);
       } else {
         setImageUrl(result.url);
       }
     } catch {
-      setError("이미지 업로드에 실패했어요. 다시 시도해주세요");
+      setImageError("이미지 용량이 너무 커서 업로드가 안 돼요. 다른 이미지로 시도해주세요");
       setImagePreview(funding.image_url);
     } finally {
       setImageUploading(false);
@@ -132,6 +133,9 @@ export default function EditClient({ token, funding, gift }: Props) {
               className="hidden"
               onChange={handleImageChange}
             />
+            {imageError && (
+              <p className="text-sm text-red-500">{imageError}</p>
+            )}
           </div>
 
           <Input

@@ -27,6 +27,7 @@ export default function CreatePage() {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [imageUploading, setImageUploading] = useState(false);
+  const [imageError, setImageError] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -35,20 +36,20 @@ export default function CreatePage() {
 
     setImagePreview(URL.createObjectURL(file));
     setImageUploading(true);
-    setError("");
+    setImageError("");
 
     const formData = new FormData();
     formData.append("file", file);
     try {
       const result = await uploadFundingImage(formData);
       if ("error" in result) {
-        setError(result.error);
+        setImageError(result.error);
         setImagePreview(null);
       } else {
         setImageUrl(result.url);
       }
     } catch {
-      setError("이미지 업로드에 실패했어요. 다시 시도해주세요");
+      setImageError("이미지 용량이 너무 커서 업로드가 안 돼요. 다른 이미지로 시도해주세요");
       setImagePreview(null);
     } finally {
       setImageUploading(false);
@@ -155,6 +156,9 @@ export default function CreatePage() {
             />
             {imageUrl && (
               <p className="text-xs text-green-600">✓ 이미지 업로드 완료</p>
+            )}
+            {imageError && (
+              <p className="text-sm text-red-500">{imageError}</p>
             )}
           </div>
 
