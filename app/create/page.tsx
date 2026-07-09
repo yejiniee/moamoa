@@ -118,13 +118,13 @@ export default function CreatePage() {
     <>
       <Header backHref="/" />
       <main className="px-4 py-6">
-        <h1 className="text-xl font-bold mb-6">펀딩 만들기 🎂</h1>
+        <h1 className="text-xl font-bold mb-6">펀딩 만들기</h1>
         <div className="flex flex-col gap-5">
           {/* 이미지 업로드 */}
           <div className="flex flex-col gap-1">
             <label className="text-sm font-medium text-gray-700">이미지</label>
             <div
-              className="relative border-2 border-dashed border-gray-200 rounded-xl overflow-hidden cursor-pointer hover:border-rose-300 transition-colors aspect-square"
+              className="relative border-2 border-dashed border-gray-200 rounded-2xl overflow-hidden cursor-pointer hover:border-rose-300 transition-colors aspect-[4/3]"
               onClick={() => fileInputRef.current?.click()}
             >
               {imagePreview ? (
@@ -211,7 +211,7 @@ export default function CreatePage() {
             onClick={handleCreateFunding}
             disabled={isPending || imageUploading}
           >
-            {isPending ? "생성 중..." : "펀딩 만들기 🎂"}
+            {isPending ? "생성 중..." : "펀딩 만들기"}
           </Button>
         </div>
       </main>
