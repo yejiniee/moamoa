@@ -58,7 +58,7 @@ export default function EditClient({ token, funding, gift }: Props) {
         setImageUrl(result.url);
       }
     } catch {
-      setImageError("이미지 용량이 너무 커서 업로드가 안 돼요. 다른 이미지로 시도해주세요");
+      setImageError("5MB 이하 파일을 넣어주세요");
       setImagePreview(funding.image_url);
     } finally {
       setImageUploading(false);
