@@ -48,13 +48,19 @@ export default function EditClient({ token, funding, gift }: Props) {
     setError("");
     const formData = new FormData();
     formData.append("file", file);
-    const result = await uploadFundingImage(formData);
-    setImageUploading(false);
-    if ("error" in result) {
-      setError(result.error);
+    try {
+      const result = await uploadFundingImage(formData);
+      if ("error" in result) {
+        setError(result.error);
+        setImagePreview(funding.image_url);
+      } else {
+        setImageUrl(result.url);
+      }
+    } catch {
+      setError("이미지 업로드에 실패했어요. 다시 시도해주세요");
       setImagePreview(funding.image_url);
-    } else {
-      setImageUrl(result.url);
+    } finally {
+      setImageUploading(false);
     }
   };
 
@@ -66,20 +72,24 @@ export default function EditClient({ token, funding, gift }: Props) {
     setError("");
 
     startTransition(async () => {
-      const result = await updateFunding(token, {
-        title,
-        description,
-        endDate,
-        imageUrl,
-        gift: {
-          id: gift.id,
-          name: title,
-          targetAmount: parseInt(giftTargetAmount.replace(/,/g, ""), 10),
-          description: "",
-        },
-      });
-      if ("error" in result) return setError(result.error);
-      router.back();
+      try {
+        const result = await updateFunding(token, {
+          title,
+          description,
+          endDate,
+          imageUrl,
+          gift: {
+            id: gift.id,
+            name: title,
+            targetAmount: parseInt(giftTargetAmount.replace(/,/g, ""), 10),
+            description: "",
+          },
+        });
+        if ("error" in result) return setError(result.error);
+        router.back();
+      } catch {
+        setError("저장에 실패했어요. 다시 시도해주세요");
+      }
     });
   };
 

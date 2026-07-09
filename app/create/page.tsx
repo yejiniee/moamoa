@@ -39,14 +39,19 @@ export default function CreatePage() {
 
     const formData = new FormData();
     formData.append("file", file);
-    const result = await uploadFundingImage(formData);
-    setImageUploading(false);
-
-    if ("error" in result) {
-      setError(result.error);
+    try {
+      const result = await uploadFundingImage(formData);
+      if ("error" in result) {
+        setError(result.error);
+        setImagePreview(null);
+      } else {
+        setImageUrl(result.url);
+      }
+    } catch {
+      setError("이미지 업로드에 실패했어요. 다시 시도해주세요");
       setImagePreview(null);
-    } else {
-      setImageUrl(result.url);
+    } finally {
+      setImageUploading(false);
     }
   };
 
@@ -59,21 +64,25 @@ export default function CreatePage() {
     setError("");
 
     startTransition(async () => {
-      const result = await createFunding({
-        title,
-        description,
-        imageUrl,
-        endDate,
-        gifts: [
-          {
-            name: title,
-            targetAmount: parseInt(giftTargetAmount.replace(/,/g, ""), 10),
-            description: "",
-          },
-        ],
-      });
-      if ("error" in result) return setError(result.error);
-      setShareToken(result.shareToken);
+      try {
+        const result = await createFunding({
+          title,
+          description,
+          imageUrl,
+          endDate,
+          gifts: [
+            {
+              name: title,
+              targetAmount: parseInt(giftTargetAmount.replace(/,/g, ""), 10),
+              description: "",
+            },
+          ],
+        });
+        if ("error" in result) return setError(result.error);
+        setShareToken(result.shareToken);
+      } catch {
+        setError("펀딩 생성에 실패했어요. 다시 시도해주세요");
+      }
     });
   };
 
