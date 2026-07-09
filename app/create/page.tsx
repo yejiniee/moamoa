@@ -27,6 +27,7 @@ export default function CreatePage() {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [imageUploading, setImageUploading] = useState(false);
+  const [imageError, setImageError] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -35,18 +36,23 @@ export default function CreatePage() {
 
     setImagePreview(URL.createObjectURL(file));
     setImageUploading(true);
-    setError("");
+    setImageError("");
 
     const formData = new FormData();
     formData.append("file", file);
-    const result = await uploadFundingImage(formData);
-    setImageUploading(false);
-
-    if ("error" in result) {
-      setError(result.error);
+    try {
+      const result = await uploadFundingImage(formData);
+      if ("error" in result) {
+        setImageError(result.error);
+        setImagePreview(null);
+      } else {
+        setImageUrl(result.url);
+      }
+    } catch {
+      setImageError("이미지 용량이 너무 커서 업로드가 안 돼요. 다른 이미지로 시도해주세요");
       setImagePreview(null);
-    } else {
-      setImageUrl(result.url);
+    } finally {
+      setImageUploading(false);
     }
   };
 
@@ -59,21 +65,25 @@ export default function CreatePage() {
     setError("");
 
     startTransition(async () => {
-      const result = await createFunding({
-        title,
-        description,
-        imageUrl,
-        endDate,
-        gifts: [
-          {
-            name: title,
-            targetAmount: parseInt(giftTargetAmount.replace(/,/g, ""), 10),
-            description: "",
-          },
-        ],
-      });
-      if ("error" in result) return setError(result.error);
-      setShareToken(result.shareToken);
+      try {
+        const result = await createFunding({
+          title,
+          description,
+          imageUrl,
+          endDate,
+          gifts: [
+            {
+              name: title,
+              targetAmount: parseInt(giftTargetAmount.replace(/,/g, ""), 10),
+              description: "",
+            },
+          ],
+        });
+        if ("error" in result) return setError(result.error);
+        setShareToken(result.shareToken);
+      } catch {
+        setError("펀딩 생성에 실패했어요. 다시 시도해주세요");
+      }
     });
   };
 
@@ -108,13 +118,13 @@ export default function CreatePage() {
     <>
       <Header backHref="/" />
       <main className="px-4 py-6">
-        <h1 className="text-xl font-bold mb-6">펀딩 만들기 🎂</h1>
+        <h1 className="text-xl font-bold mb-6">펀딩 만들기</h1>
         <div className="flex flex-col gap-5">
           {/* 이미지 업로드 */}
           <div className="flex flex-col gap-1">
             <label className="text-sm font-medium text-gray-700">이미지</label>
             <div
-              className="relative border-2 border-dashed border-gray-200 rounded-xl overflow-hidden cursor-pointer hover:border-rose-300 transition-colors aspect-square"
+              className="relative border-2 border-dashed border-gray-200 rounded-2xl overflow-hidden cursor-pointer hover:border-rose-300 transition-colors aspect-[4/3]"
               onClick={() => fileInputRef.current?.click()}
             >
               {imagePreview ? (
@@ -146,6 +156,9 @@ export default function CreatePage() {
             />
             {imageUrl && (
               <p className="text-xs text-green-600">✓ 이미지 업로드 완료</p>
+            )}
+            {imageError && (
+              <p className="text-sm text-red-500">{imageError}</p>
             )}
           </div>
 
@@ -198,7 +211,7 @@ export default function CreatePage() {
             onClick={handleCreateFunding}
             disabled={isPending || imageUploading}
           >
-            {isPending ? "생성 중..." : "펀딩 만들기 🎂"}
+            {isPending ? "생성 중..." : "펀딩 만들기"}
           </Button>
         </div>
       </main>

@@ -27,6 +27,7 @@ export default function EditClient({ token, funding, gift }: Props) {
     funding.image_url,
   );
   const [imageUploading, setImageUploading] = useState(false);
+  const [imageError, setImageError] = useState("");
 
   const [giftTargetAmount, setGiftTargetAmount] = useState(
     Number(gift.target_amount).toLocaleString("ko-KR"),
@@ -45,16 +46,22 @@ export default function EditClient({ token, funding, gift }: Props) {
     if (!file) return;
     setImagePreview(URL.createObjectURL(file));
     setImageUploading(true);
-    setError("");
+    setImageError("");
     const formData = new FormData();
     formData.append("file", file);
-    const result = await uploadFundingImage(formData);
-    setImageUploading(false);
-    if ("error" in result) {
-      setError(result.error);
+    try {
+      const result = await uploadFundingImage(formData);
+      if ("error" in result) {
+        setImageError(result.error);
+        setImagePreview(funding.image_url);
+      } else {
+        setImageUrl(result.url);
+      }
+    } catch {
+      setImageError("이미지 용량이 너무 커서 업로드가 안 돼요. 다른 이미지로 시도해주세요");
       setImagePreview(funding.image_url);
-    } else {
-      setImageUrl(result.url);
+    } finally {
+      setImageUploading(false);
     }
   };
 
@@ -66,20 +73,24 @@ export default function EditClient({ token, funding, gift }: Props) {
     setError("");
 
     startTransition(async () => {
-      const result = await updateFunding(token, {
-        title,
-        description,
-        endDate,
-        imageUrl,
-        gift: {
-          id: gift.id,
-          name: title,
-          targetAmount: parseInt(giftTargetAmount.replace(/,/g, ""), 10),
-          description: "",
-        },
-      });
-      if ("error" in result) return setError(result.error);
-      router.back();
+      try {
+        const result = await updateFunding(token, {
+          title,
+          description,
+          endDate,
+          imageUrl,
+          gift: {
+            id: gift.id,
+            name: title,
+            targetAmount: parseInt(giftTargetAmount.replace(/,/g, ""), 10),
+            description: "",
+          },
+        });
+        if ("error" in result) return setError(result.error);
+        router.back();
+      } catch {
+        setError("저장에 실패했어요. 다시 시도해주세요");
+      }
     });
   };
 
@@ -92,7 +103,7 @@ export default function EditClient({ token, funding, gift }: Props) {
           <div className="flex flex-col gap-1">
             <label className="text-sm font-medium text-gray-700">이미지</label>
             <div
-              className="relative border-2 border-dashed border-gray-200 rounded-xl overflow-hidden cursor-pointer hover:border-rose-300 transition-colors aspect-square"
+              className="relative border-2 border-dashed border-gray-200 rounded-2xl overflow-hidden cursor-pointer hover:border-rose-300 transition-colors aspect-[4/3]"
               onClick={() => fileInputRef.current?.click()}
             >
               {imagePreview ? (
@@ -122,6 +133,9 @@ export default function EditClient({ token, funding, gift }: Props) {
               className="hidden"
               onChange={handleImageChange}
             />
+            {imageError && (
+              <p className="text-sm text-red-500">{imageError}</p>
+            )}
           </div>
 
           <Input
