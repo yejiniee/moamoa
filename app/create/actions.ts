@@ -7,7 +7,7 @@ export async function uploadFundingImage(formData: FormData): Promise<{ url: str
   const file = formData.get('file') as File | null
   if (!file) return { error: '파일을 선택해주세요' }
   if (!file.type.startsWith('image/')) return { error: '이미지 파일만 업로드 가능해요' }
-  if (file.size > 5 * 1024 * 1024) return { error: '파일 크기는 5MB 이하여야 해요' }
+  if (file.size > 5 * 1024 * 1024) return { error: '5MB 이하 파일을 넣어주세요' }
 
   const serverClient = await createServerSupabaseClient()
   const { data: { user } } = await serverClient.auth.getUser()
