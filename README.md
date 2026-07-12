@@ -1,36 +1,71 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🎁 모아모아 (MoaMoa)
 
-## Getting Started
+**친구들과 함께 모아서 선물하는 생일선물 펀딩 서비스**
+#### 👉 [서비스 바로가기](https://moamoa-xi.vercel.app/login)
 
-First, run the development server:
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+생일자 혹은 지인이 펀딩을 만들고 링크를 공유하면, 참여자들은 **로그인 없이** 원하는 금액을 결제해 마음을 보탤 수 있어요. 모인 금액은 주최자에게 정산됩니다.
+
+## 🔑 테스트 계정
+
+아래 계정으로 로그인하세요.
+
+| 항목 | 값 |
+|---|---|
+| 이메일 | `test@example.com` |
+| 비밀번호 | `qwer1234!` |
+
+
+## 🔄 서비스 흐름
+
+1. **주최자**가 이메일로 가입하고 펀딩을 생성하면 고유 공유 링크가 발급됩니다.
+2. **참여자**는 링크로 접속해 이름·메시지·금액을 입력하고 토스페이먼츠로 결제합니다.
+3. 결제는 `/api/payment/confirm`에서 서버 측 검증을 거쳐 기록되고, 펀딩 페이지의 모금 현황이 실시간으로 갱신됩니다.
+4. 펀딩 마감 후 주최자는 관리 페이지에서 **정산을 요청**합니다.
+
+> ⚠️ 현재 결제는 **토스페이먼츠 테스트 모드**로 동작하며 실제 금액이 청구되지 않습니다.
+
+## 🎬 데모
+
+
+## ✨ 주요 기능
+
+- **펀딩 생성** — 이메일 회원가입 후 선물(이름·목표금액·이미지)을 등록해 펀딩 개설
+- **링크 공유** — `share_token` 기반 공유 링크로 누구나 접근 가능 (참여자 로그인 불필요)
+- **간편 결제** — 토스페이먼츠 결제창으로 참여 (현재 테스트 모드)
+- **실시간 현황** — Supabase Realtime으로 결제가 발생하면 모금 현황이 자동 갱신
+- **카카오 공유** — 카카오 공유 SDK로 펀딩 링크 공유
+- **관리 페이지** — 주최자 전용 페이지에서 펀딩 수정·마감·정산 요청
+
+## 🛠 기술 스택
+
+| 영역 | 기술 |
+|---|---|
+| 프레임워크 | Next.js 14 (App Router), React 18, TypeScript |
+| 스타일링 | Tailwind CSS |
+| DB / Auth / Realtime | Supabase (PostgreSQL) |
+| 결제 | 토스페이먼츠 SDK |
+| 테스트 | Vitest (단위), Playwright (E2E) |
+| CI | GitHub Actions (E2E, Lighthouse) |
+
+## 📁 프로젝트 구조
+
+```
+moamoa/
+├── app/                    # Next.js App Router 페이지
+│   ├── api/payment/confirm/  # 토스페이먼츠 결제 서버 검증 API
+│   ├── create/               # 펀딩 생성
+│   ├── funding/               # 펀딩 목록
+│   │   └── [token]/           # 펀딩 상세 (공유 링크)
+│   │       ├── admin/         # 주최자 관리 페이지
+│   │       ├── edit/          # 펀딩 수정
+│   │       └── pay/           # 결제 참여
+│   ├── login/ · register/     # 주최자 로그인 / 회원가입
+│   └── payment/               # 결제 성공 / 실패
+├── components/             # UI · 펀딩 · 결제 컴포넌트
+├── lib/                    # Supabase 클라이언트, 유틸
+├── supabase/               # DB 스키마 (schema.sql)
+├── e2e/                    # Playwright E2E 테스트
+└── docs/                   # 설계 문서
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
