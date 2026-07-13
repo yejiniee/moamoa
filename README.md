@@ -26,6 +26,31 @@
 > ⚠️ 현재 결제는 **토스페이먼츠 테스트 모드**로 동작하며 실제 금액이 청구되지 않습니다.
 
 ## 🎬 데모
+<table>
+  <tr>
+    <td align="center" width="50%">
+      <img width="100%" alt="로그인 후 펀딩리스트 확인" src="https://github.com/user-attachments/assets/21d79224-f841-4b42-b1e9-5bce1a824ff8" />
+    </td>
+    <td valign="top" width="50%">
+      <br />
+      <strong>로그인하기</strong>
+      <p>로그 후 내가 생성한 펀딩을 확인할 수 있습니다. 관리 버튼을 누르면 펀딩을 수정/삭제/마감 처리할 수 있습니다.</p>
+    </td>
+  </tr>
+</table>
+<table>
+  <tr>
+    <td align="center" width="50%">
+      <img width="100%" alt="펀딩 생성하기" src="https://github.com/user-attachments/assets/d266b1ec-307c-4e60-8dbc-8c168e682b2e" />
+    </td>
+    <td valign="top" width="50%">
+      <br />
+      <strong>펀딩을 생성합니다.</strong>
+      <p>원하는 선물의 이미지(옵션), 제목, 설명(옵션), 마감일자, 금액을 적고 생일선물 펀딩을 생성합니다. 링크를 복사하여 공유할 수 있습니다.</p>
+    </td>
+  </tr>
+</table>
+
 
 
 ## ✨ 주요 기능
