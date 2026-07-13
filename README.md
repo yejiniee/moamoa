@@ -50,24 +50,22 @@
     </td>
   </tr>
 </table>
-<table>
+<table width="100%">
+  <!-- 첫 번째 행: 펀딩 참여하기 -->
   <tr>
     <td align="center" width="50%">
       <img width="100%" alt="펀딩 참여하기" src="https://github.com/user-attachments/assets/738dff46-773d-4e82-b46f-b652062c50ff" />
-
     </td>
     <td valign="top" width="50%">
       <br />
       <strong>펀딩에 참여합니다.</strong>
-      <p>공유받은 링크로 접속하여 선물하기에 참여합니다. 선물할 금액과 이름, 메시지를 적고 결제합니다.
-</p>
+      <p>공유받은 링크로 접속하여 선물하기에 참여합니다. 선물할 금액과 이름, 메시지를 적고 결제합니다.</p>
     </td>
   </tr>
-</table>
-<table>
+  <!-- 두 번째 행: 카톡 공유하기 (여기에 합쳤습니다) -->
   <tr>
     <td align="center" width="50%">
-      <img width="100%" alt=카톡 공유하기" src="https://github.com/user-attachments/assets/3c872adf-7c7a-40c0-ac97-15f1aef03b19" />
+      <img width="100%" alt="카톡 공유하기" src="https://github.com/user-attachments/assets/3c872adf-7c7a-40c0-ac97-15f1aef03b19" />
     </td>
     <td valign="top" width="50%">
       <br />
