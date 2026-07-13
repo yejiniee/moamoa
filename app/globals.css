@@ -51,6 +51,11 @@ a {
   input[type="date"] {
     -webkit-appearance: none;
     appearance: none;
+    text-align: left;
+  }
+
+  input[type="date"]::-webkit-date-and-time-value {
+    text-align: left;
   }
 }
 
