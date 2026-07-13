@@ -13,6 +13,8 @@ export default function Input({ label, error, hint, className = '', id, type, ..
   const inputId = id ?? generatedId
   const [visible, setVisible] = useState(false)
   const isPassword = type === 'password'
+  const isDate = type === 'date'
+  const showDatePlaceholder = isDate && !props.value
 
   return (
     <div className="flex flex-col gap-1.5">
@@ -26,9 +28,9 @@ export default function Input({ label, error, hint, className = '', id, type, ..
           id={inputId}
           type={isPassword ? (visible ? 'text' : 'password') : type}
           className={[
-            'h-[56px] w-full rounded-[12px] border bg-white px-4',
+            'peer h-[56px] w-full rounded-[12px] border bg-white px-4',
             isPassword ? 'pr-12' : '',
-            'text-[15px] text-[#191F28] placeholder:text-gray-400',
+            'text-left text-[16px] text-[#191F28] placeholder:text-gray-400',
             'outline-none transition-colors duration-100',
             error
               ? 'border-red-400 focus:border-red-400 focus:ring-2 focus:ring-red-100'
@@ -37,6 +39,11 @@ export default function Input({ label, error, hint, className = '', id, type, ..
           ].join(' ')}
           {...props}
         />
+        {showDatePlaceholder && (
+          <div className="pointer-events-none absolute inset-0 flex items-center rounded-[12px] border border-[#E8EAED] bg-white px-4 text-[16px] text-gray-400 peer-focus:opacity-0">
+            연도. 월. 일.
+          </div>
+        )}
         {isPassword && (
           <button
             type="button"
