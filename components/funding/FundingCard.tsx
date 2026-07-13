@@ -49,7 +49,7 @@ export default function FundingCard({ funding, totalRaised, totalTarget, priorit
           <ProgressBar percent={percent} />
           <div className="flex justify-between text-xs text-gray-500">
             <span className="text-rose-500 font-semibold">{percent}% 달성</span>
-            <span>{formatKRW(totalRaised)}</span>
+            <span>{formatKRW(totalTarget)}</span>
           </div>
         </div>
       </div>
