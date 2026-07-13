@@ -37,4 +37,15 @@ describe('calcPercent', () => {
   it('total이 0이면 0을 반환한다', () => {
     expect(calcPercent(0, 0)).toBe(0)
   })
+
+  it('후원이 있으면 0.5% 미만이어도 0%가 아닌 최소 1%를 반환한다', () => {
+    // 목표가 크고 후원이 소액일 때 Math.round로 0%가 되어 바가 비던 버그
+    expect(calcPercent(100000, 23423423)).toBe(1) // 0.43%
+    expect(calcPercent(20000, 46600000)).toBe(1) // 0.04%
+    expect(calcPercent(1, 100000000)).toBe(1)
+  })
+
+  it('후원이 전혀 없으면 0%를 반환한다', () => {
+    expect(calcPercent(0, 50000)).toBe(0)
+  })
 })
