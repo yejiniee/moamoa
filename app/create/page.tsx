@@ -6,6 +6,7 @@ import Image from "next/image";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import Header from "@/components/ui/Header";
+import Toast from "@/components/ui/Toast";
 import { uploadFundingImage, createFunding } from "./actions";
 
 export default function CreatePage() {
@@ -22,6 +23,7 @@ export default function CreatePage() {
   };
   const [error, setError] = useState("");
   const [shareToken, setShareToken] = useState("");
+  const [toast, setToast] = useState<string | null>(null);
 
   // 이미지 업로드 상태
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -89,6 +91,14 @@ export default function CreatePage() {
 
   if (shareToken) {
     const shareUrl = `${window.location.origin}/funding/${shareToken}`;
+    const handleCopyLink = async () => {
+      try {
+        await navigator.clipboard.writeText(shareUrl);
+        setToast("링크를 복사했어요");
+      } catch {
+        setToast("복사에 실패했어요");
+      }
+    };
     return (
       <main className="min-h-screen flex items-center justify-center px-4 bg-gray-50">
         <div className="w-full max-w-md bg-white rounded-2xl p-8 shadow-sm text-center flex flex-col gap-4">
@@ -100,7 +110,7 @@ export default function CreatePage() {
           <div className="bg-gray-100 rounded-xl p-4 break-all text-sm text-gray-700">
             {shareUrl}
           </div>
-          <Button onClick={() => navigator.clipboard.writeText(shareUrl)}>
+          <Button onClick={handleCopyLink}>
             링크 복사하기
           </Button>
           <button
@@ -110,6 +120,7 @@ export default function CreatePage() {
             펀딩 페이지 보러가기 →
           </button>
         </div>
+        <Toast message={toast} onDismiss={() => setToast(null)} />
       </main>
     );
   }
