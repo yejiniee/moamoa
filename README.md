@@ -66,7 +66,7 @@
 <table>
   <tr>
     <td align="center" width="50%">
-      <img width="100%" alt=카톡 공유하기" src="https://github.com/user-attachments/assets/7430857e-e5a0-4a67-95f7-12cc228227c4" />
+      <img width="100%" alt=카톡 공유하기" src="https://github.com/user-attachments/assets/3c872adf-7c7a-40c0-ac97-15f1aef03b19" />
     </td>
     <td valign="top" width="50%">
       <br />
