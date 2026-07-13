@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import Button from '@/components/ui/Button'
 
@@ -19,8 +19,14 @@ export default function SuccessClient(props: Props) {
   const [confirmed, setConfirmed] = useState(false)
   const [error, setError] = useState('')
   const [showKakao, setShowKakao] = useState(false)
+  const confirmRequested = useRef(false)
 
   useEffect(() => {
+    // StrictMode의 이중 실행이나 리마운트로 confirm이 중복 호출되면
+    // 토스가 두 번째 요청을 "이미 처리중인 요청입니다"로 거부하므로 한 번만 보낸다
+    if (confirmRequested.current) return
+    confirmRequested.current = true
+
     fetch('/api/payment/confirm', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
