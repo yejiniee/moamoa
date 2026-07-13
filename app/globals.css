@@ -43,12 +43,14 @@ a {
   -webkit-tap-highlight-color: transparent;
 }
 
-/* iOS Safari: input[type=date]의 값 텍스트는 별도 pseudo-element가 그리며
-   자체 가운데 정렬 + 고정 최소 너비를 가져 바깥 input의 width/text-align을
-   무시하고 화면 밖으로 넘칠 수 있음 */
-input[type="date"]::-webkit-date-and-time-value {
-  text-align: left;
-  min-width: 0;
-  width: 100%;
+/* iOS Safari: input[type=date]의 네이티브 렌더링(내부 pseudo-element)이
+   자체 최소 너비/정렬을 가져 width 지정을 무시하고 화면 밖으로 넘칠 수 있음.
+   Safari 계열에서만 네이티브 appearance를 제거해 일반 박스 모델로 그리게 함
+   (Chrome은 네이티브 캘린더 아이콘을 유지해야 하므로 제외) */
+@supports (-webkit-touch-callout: none) {
+  input[type="date"] {
+    -webkit-appearance: none;
+    appearance: none;
+  }
 }
 
