@@ -27,7 +27,7 @@ export default function AmountSelector({ value, onChange }: Props) {
       <div className="flex items-center gap-2">
         <input
           type="number"
-          className="flex-1 border border-gray-300 rounded-2xl px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-rose-300"
+          className="flex-1 border border-gray-300 rounded-2xl px-3 py-2 text-base outline-none focus:ring-2 focus:ring-rose-300"
           placeholder="직접 입력 (최소 1,000원)"
           min={1000}
           value={value || ''}
