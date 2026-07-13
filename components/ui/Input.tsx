@@ -17,18 +17,18 @@ export default function Input({ label, error, hint, className = '', id, type, ..
   const showDatePlaceholder = isDate && !props.value
 
   return (
-    <div className="flex flex-col gap-1.5">
+    <div className="flex min-w-0 flex-col gap-1.5">
       {label && (
         <label htmlFor={inputId} className="text-[14px] font-medium text-gray-600">
           {label}
         </label>
       )}
-      <div className="relative">
+      <div className="relative min-w-0">
         <input
           id={inputId}
           type={isPassword ? (visible ? 'text' : 'password') : type}
           className={[
-            'peer h-[56px] w-full rounded-[12px] border bg-white px-4',
+            'peer h-[56px] w-full min-w-0 max-w-full rounded-[12px] border bg-white px-4',
             isPassword ? 'pr-12' : '',
             'text-left text-[16px] text-[#191F28] placeholder:text-gray-400',
             'outline-none transition-colors duration-100',
