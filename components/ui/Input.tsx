@@ -40,7 +40,7 @@ export default function Input({ label, error, hint, className = '', id, type, ..
           {...props}
         />
         {showDatePlaceholder && (
-          <div className="pointer-events-none absolute inset-0 flex items-center rounded-[12px] border border-[#E8EAED] bg-white px-4 text-[16px] text-gray-400 peer-focus:opacity-0">
+          <div className="pointer-events-none absolute inset-0 hidden items-center rounded-[12px] border border-[#E8EAED] bg-white px-4 text-[16px] text-gray-400 supports-[-webkit-touch-callout:none]:flex peer-focus:opacity-0">
             연도. 월. 일.
           </div>
         )}
