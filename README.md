@@ -53,7 +53,8 @@
 <table>
   <tr>
     <td align="center" width="50%">
-      <img width="100%" alt="펀딩 참여하기" src="https://github.com/user-attachments/assets/5af12cdc-0728-4a9b-9258-d449d46da5c1" />
+      <img width="100%" alt="펀딩 참여하기" src="https://github.com/user-attachments/assets/738dff46-773d-4e82-b46f-b652062c50ff" />
+
     </td>
     <td valign="top" width="50%">
       <br />
