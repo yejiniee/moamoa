@@ -50,8 +50,30 @@
     </td>
   </tr>
 </table>
-
-
+<table>
+  <tr>
+    <td align="center" width="50%">
+      <img width="100%" alt="펀딩 참여하기" src="https://github.com/user-attachments/assets/5af12cdc-0728-4a9b-9258-d449d46da5c1" />
+    </td>
+    <td valign="top" width="50%">
+      <br />
+      <strong>펀딩에 참여합니다.</strong>
+      <p>공유받은 링크로 접속하여 선물하기에 참여합니다. 선물할 금액과 이름, 메시지를 적고 결제합니다.
+</p>
+    </td>
+  </tr>
+</table>
+<table>
+  <tr>
+    <td align="center" width="50%">
+      <img width="100%" alt=카톡 공유하기" src="https://github.com/user-attachments/assets/7430857e-e5a0-4a67-95f7-12cc228227c4" />
+    </td>
+    <td valign="top" width="50%">
+      <br />
+      <strong>펀딩 참여 후 주최자에게 결과를 공유할 수 있습니다.</strong>
+    </td>
+  </tr>
+</table>
 
 ## ✨ 주요 기능
 
