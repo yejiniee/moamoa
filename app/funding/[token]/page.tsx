@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import FundingRealtime from "./FundingRealtime";
 import Button from "@/components/ui/Button";
 import Header from "@/components/ui/Header";
-import SettleButton from "@/components/funding/SettleButton";
+import CloseButton from "@/components/funding/CloseButton";
 
 function calcDday(endDate: string): string {
   const end = new Date(endDate);
@@ -57,7 +57,8 @@ export default async function FundingPage({
   ]);
 
   const dday = calcDday(funding.end_date);
-  const isClosed = funding.status === "closed";
+  // 마감(closed)이든 정산완료(settled)든 진행중이 아니면 종료 상태
+  const isEnded = funding.status !== "active";
   const totalTarget = (gifts ?? []).reduce(
     (sum, g) => sum + g.target_amount,
     0,
@@ -87,7 +88,7 @@ export default async function FundingPage({
       <main className="max-w-md mx-auto">
         {/* TDS Paragraph — 제목 영역 */}
         <div className="px-5 pt-6 pb-4">
-          {isClosed ? (
+          {isEnded ? (
             <span className="inline-block text-xs font-semibold text-gray-500 bg-gray-100 px-2.5 py-1 rounded-full mb-3">
               종료
             </span>
@@ -120,12 +121,18 @@ export default async function FundingPage({
 
       <div className="max-w-md mx-auto px-5 py-6">
         {isOwner ? (
-          <SettleButton
-            fundingId={funding.id}
-            goalReached={goalReached}
-            defaultSettled={isClosed}
-          />
-        ) : isClosed ? (
+          funding.status === "active" ? (
+            <CloseButton fundingId={funding.id} goalReached={goalReached} />
+          ) : funding.status === "settled" ? (
+            <div className="h-[56px] flex items-center justify-center rounded-[14px] bg-emerald-50 text-emerald-600 text-[17px] font-semibold">
+              정산 완료된 펀딩이에요
+            </div>
+          ) : (
+            <Link href={`/funding/${params.token}/admin`}>
+              <Button>정산하러 가기 →</Button>
+            </Link>
+          )
+        ) : isEnded ? (
           <div className="h-[56px] flex items-center justify-center rounded-[14px] bg-gray-100 text-gray-400 text-[17px] font-semibold">
             마감된 펀딩이에요
           </div>

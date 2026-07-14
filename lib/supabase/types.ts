@@ -1,4 +1,4 @@
-export type FundingStatus = 'active' | 'closed'
+export type FundingStatus = 'active' | 'closed' | 'settled'
 export type PaymentStatus = 'pending' | 'confirmed' | 'failed'
 
 // Convenience aliases (for component props)
@@ -19,6 +19,11 @@ export type Database = {
           end_date: string
           share_token: string
           status: FundingStatus
+          settled_at: string | null
+          settled_amount: number | null
+          settle_bank_name: string | null
+          settle_account_number: string | null
+          settle_account_holder: string | null
           created_at: string
         }
         Insert: {
@@ -30,6 +35,11 @@ export type Database = {
           end_date: string
           share_token: string
           status?: FundingStatus
+          settled_at?: string | null
+          settled_amount?: number | null
+          settle_bank_name?: string | null
+          settle_account_number?: string | null
+          settle_account_holder?: string | null
           created_at?: string
         }
         Update: {
@@ -41,6 +51,11 @@ export type Database = {
           end_date?: string
           share_token?: string
           status?: FundingStatus
+          settled_at?: string | null
+          settled_amount?: number | null
+          settle_bank_name?: string | null
+          settle_account_number?: string | null
+          settle_account_holder?: string | null
           created_at?: string
         }
         Relationships: []

@@ -20,26 +20,20 @@ export default async function AdminPage({ params }: { params: { token: string } 
   // 펀딩 없거나 본인 펀딩이 아니면 404
   if (!funding || funding.creator_user_id !== user.id) notFound()
 
-  const [{ data: payments }, { data: gifts }] = await Promise.all([
-    supabase
-      .from('payments')
-      .select('*')
-      .eq('funding_id', funding.id)
-      .eq('status', 'confirmed')
-      .order('created_at', { ascending: false }),
-    supabase.from('gifts').select('*').eq('funding_id', funding.id),
-  ])
+  const { data: payments } = await supabase
+    .from('payments')
+    .select('*')
+    .eq('funding_id', funding.id)
+    .eq('status', 'confirmed')
+    .order('created_at', { ascending: false })
 
   const totalAmount = (payments ?? []).reduce((sum, p) => sum + p.amount, 0)
-  const totalTarget = (gifts ?? []).reduce((sum, g) => sum + g.target_amount, 0)
-  const goalReached = totalTarget > 0 && totalAmount >= totalTarget
 
   return (
     <AdminClient
       funding={funding}
       payments={payments ?? []}
       totalAmount={totalAmount}
-      goalReached={goalReached}
     />
   )
 }

@@ -10,7 +10,8 @@ export default async function PayPage({ params }: { params: { token: string } })
     .eq('share_token', params.token)
     .single()
 
-  if (!funding || funding.status === 'closed') notFound()
+  // 진행중(active)이 아닌 펀딩(마감/정산완료)은 결제를 받지 않는다
+  if (!funding || funding.status !== 'active') notFound()
 
   return <PayClient fundingId={funding.id} fundingTitle={funding.title} />
 }
