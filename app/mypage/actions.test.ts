@@ -43,7 +43,7 @@ beforeEach(() => {
 
 const validBank = { bankName: '토스뱅크', accountNumber: '100012345678', accountHolder: '홍길동' }
 
-describe('updateBankAccount (계좌 저장)', () => {
+describe('updateBankAccount (저장하기)', () => {
   it('유효한 계좌를 저장하면 profiles에 upsert된다', async () => {
     const res = await updateBankAccount(validBank)
     expect(res).toEqual({ success: true })
@@ -70,7 +70,7 @@ describe('updateBankAccount (계좌 저장)', () => {
   })
 })
 
-describe('changePassword (비밀번호 변경)', () => {
+describe('changePassword (변경하기)', () => {
   it('유효한 비밀번호로 변경하면 updateUser가 호출된다', async () => {
     const res = await changePassword('newpass123')
     expect(res).toEqual({ success: true })

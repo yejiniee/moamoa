@@ -20,7 +20,7 @@ export default function MyPageLogoutButton() {
     <button
       onClick={handleLogout}
       disabled={isPending}
-      className="h-[52px] w-full rounded-xl border border-gray-200 text-sm font-semibold text-gray-600 disabled:opacity-40"
+      className="h-[52px] w-full rounded-xl border border-gray-200 bg-white text-sm font-semibold text-gray-600 transition-all duration-100 hover:bg-gray-50 active:bg-gray-100 active:scale-[0.98] disabled:opacity-40 disabled:pointer-events-none"
     >
       {isPending ? '로그아웃 중...' : '로그아웃'}
     </button>

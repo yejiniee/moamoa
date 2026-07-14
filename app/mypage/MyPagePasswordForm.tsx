@@ -1,40 +1,40 @@
-'use client'
+"use client";
 
-import { useState, useTransition } from 'react'
-import { changePassword } from './actions'
+import { useState, useTransition } from "react";
+import { changePassword } from "./actions";
 
 const inputCls =
-  'h-[52px] rounded-xl border border-gray-200 px-4 text-sm outline-none focus:border-rose-400'
+  "h-[52px] rounded-xl border border-gray-200 px-4 text-sm outline-none focus:border-rose-400";
 
 export default function MyPagePasswordForm() {
-  const [password, setPassword] = useState('')
-  const [confirm, setConfirm] = useState('')
-  const [error, setError] = useState('')
-  const [done, setDone] = useState(false)
-  const [isPending, startTransition] = useTransition()
+  const [password, setPassword] = useState("");
+  const [confirm, setConfirm] = useState("");
+  const [error, setError] = useState("");
+  const [done, setDone] = useState(false);
+  const [isPending, startTransition] = useTransition();
 
   const handleChange = () => {
-    setError('')
-    setDone(false)
+    setError("");
+    setDone(false);
     if (password.length < 8) {
-      setError('비밀번호는 8자 이상이어야 합니다')
-      return
+      setError("비밀번호는 8자 이상이어야 합니다");
+      return;
     }
     if (password !== confirm) {
-      setError('비밀번호가 일치하지 않습니다')
-      return
+      setError("비밀번호가 일치하지 않습니다");
+      return;
     }
     startTransition(async () => {
-      const res = await changePassword(password)
-      if ('error' in res) {
-        setError(res.error)
-        return
+      const res = await changePassword(password);
+      if ("error" in res) {
+        setError(res.error);
+        return;
       }
-      setPassword('')
-      setConfirm('')
-      setDone(true)
-    })
-  }
+      setPassword("");
+      setConfirm("");
+      setDone(true);
+    });
+  };
 
   return (
     <div className="flex flex-col gap-3">
@@ -53,14 +53,16 @@ export default function MyPagePasswordForm() {
         className={inputCls}
       />
       {error && <p className="text-sm text-red-500">{error}</p>}
-      {done && <p className="text-sm text-emerald-600">비밀번호가 변경되었어요 ✅</p>}
+      {done && (
+        <p className="text-sm text-emerald-600">비밀번호가 변경되었어요 ✅</p>
+      )}
       <button
         onClick={handleChange}
         disabled={isPending}
-        className="h-[52px] rounded-xl bg-rose-500 text-white text-sm font-semibold disabled:opacity-40"
+        className="h-[52px] rounded-xl bg-rose-500 text-white text-sm font-semibold transition-all duration-100 hover:bg-rose-600 active:bg-rose-700 active:scale-[0.98] disabled:opacity-40 disabled:pointer-events-none"
       >
-        {isPending ? '변경 중...' : '비밀번호 변경'}
+        {isPending ? "변경 중..." : "변경하기"}
       </button>
     </div>
-  )
+  );
 }
