@@ -1,0 +1,66 @@
+'use client'
+
+import { useState, useTransition } from 'react'
+import { changePassword } from './actions'
+
+const inputCls =
+  'h-[52px] rounded-xl border border-gray-200 px-4 text-sm outline-none focus:border-rose-400'
+
+export default function MyPagePasswordForm() {
+  const [password, setPassword] = useState('')
+  const [confirm, setConfirm] = useState('')
+  const [error, setError] = useState('')
+  const [done, setDone] = useState(false)
+  const [isPending, startTransition] = useTransition()
+
+  const handleChange = () => {
+    setError('')
+    setDone(false)
+    if (password.length < 8) {
+      setError('비밀번호는 8자 이상이어야 합니다')
+      return
+    }
+    if (password !== confirm) {
+      setError('비밀번호가 일치하지 않습니다')
+      return
+    }
+    startTransition(async () => {
+      const res = await changePassword(password)
+      if ('error' in res) {
+        setError(res.error)
+        return
+      }
+      setPassword('')
+      setConfirm('')
+      setDone(true)
+    })
+  }
+
+  return (
+    <div className="flex flex-col gap-3">
+      <input
+        type="password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        placeholder="새 비밀번호 (8자 이상)"
+        className={inputCls}
+      />
+      <input
+        type="password"
+        value={confirm}
+        onChange={(e) => setConfirm(e.target.value)}
+        placeholder="새 비밀번호 확인"
+        className={inputCls}
+      />
+      {error && <p className="text-sm text-red-500">{error}</p>}
+      {done && <p className="text-sm text-emerald-600">비밀번호가 변경되었어요 ✅</p>}
+      <button
+        onClick={handleChange}
+        disabled={isPending}
+        className="h-[52px] rounded-xl bg-rose-500 text-white text-sm font-semibold disabled:opacity-40"
+      >
+        {isPending ? '변경 중...' : '비밀번호 변경'}
+      </button>
+    </div>
+  )
+}
