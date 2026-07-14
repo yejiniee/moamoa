@@ -73,7 +73,18 @@
     </td>
   </tr>
 </table>
-
+<table>
+  <tr>
+    <td align="center" width="50%">
+      <img width="100%" alt="펀딩 정산하기" src="https://github.com/user-attachments/assets/7e2fff57-232f-46ff-8ff4-2d13815c312c" />
+    </td>
+    <td valign="top" width="50%">
+      <br />
+      <strong>펀딩을 마감하고 정산합니다.</strong>
+      <p>테스트 목적으로 제공되는 기능입니다. 정산 요청 시 실제 계좌로 입금되지 않으며, 시스템 내부 데이터(정산 테이블)에만 기록됩니다.</p>
+    </td>
+  </tr>
+</table>
 ## ✨ 주요 기능
 
 - **펀딩 생성** — 이메일 회원가입 후 선물(이름·목표금액·이미지)을 등록해 펀딩 개설
