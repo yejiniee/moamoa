@@ -14,14 +14,12 @@ type Props = {
   funding: Funding;
   payments: Payment[];
   totalAmount: number;
-  goalReached: boolean;
 };
 
 export default function AdminClient({
   funding,
   payments,
   totalAmount,
-  goalReached,
 }: Props) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -117,9 +115,15 @@ export default function AdminClient({
 
         <SettleButton
           fundingId={funding.id}
-          goalReached={goalReached}
-          defaultSettled={funding.status === "closed"}
-          mode="settle"
+          status={funding.status}
+          totalAmount={totalAmount}
+          settledInfo={{
+            settledAmount: funding.settled_amount,
+            bankName: funding.settle_bank_name,
+            accountNumber: funding.settle_account_number,
+            accountHolder: funding.settle_account_holder,
+            settledAt: funding.settled_at,
+          }}
         />
       </main>
 
