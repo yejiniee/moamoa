@@ -29,11 +29,26 @@ export default async function AdminPage({ params }: { params: { token: string } 
 
   const totalAmount = (payments ?? []).reduce((sum, p) => sum + p.amount, 0)
 
+  const { data: profile } = await serverClient
+    .from('profiles')
+    .select('bank_name, account_number, account_holder')
+    .eq('user_id', user.id)
+    .maybeSingle()
+
+  const defaultBank = profile
+    ? {
+        bankName: profile.bank_name ?? '',
+        accountNumber: profile.account_number ?? '',
+        accountHolder: profile.account_holder ?? '',
+      }
+    : undefined
+
   return (
     <AdminClient
       funding={funding}
       payments={payments ?? []}
       totalAmount={totalAmount}
+      defaultBank={defaultBank}
     />
   )
 }

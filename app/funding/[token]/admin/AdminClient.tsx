@@ -13,12 +13,18 @@ type Props = {
   funding: Funding;
   payments: Payment[];
   totalAmount: number;
+  defaultBank?: {
+    bankName: string;
+    accountNumber: string;
+    accountHolder: string;
+  };
 };
 
 export default function AdminClient({
   funding,
   payments,
   totalAmount,
+  defaultBank,
 }: Props) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -115,6 +121,7 @@ export default function AdminClient({
           fundingId={funding.id}
           status={funding.status}
           totalAmount={totalAmount}
+          defaultBank={defaultBank}
           settledInfo={{
             settledAmount: funding.settled_amount,
             bankName: funding.settle_bank_name,

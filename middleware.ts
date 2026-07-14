@@ -33,6 +33,7 @@ export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const isProtected =
     pathname.startsWith("/create") ||
+    pathname.startsWith("/mypage") ||
     /^\/funding\/[^/]+\/(admin|edit)/.test(pathname);
 
   if (isProtected && !user) {

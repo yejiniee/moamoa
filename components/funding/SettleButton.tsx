@@ -18,18 +18,23 @@ type Props = {
     accountHolder: string | null
     settledAt: string | null
   }
+  defaultBank?: {
+    bankName: string
+    accountNumber: string
+    accountHolder: string
+  }
 }
 
 // 정산하기: 마감(closed)된 펀딩의 모인 금액을 인출(기록)한다.
 // - active(진행중): 마감 전이라 비활성화
 // - closed(마감):   계좌 정보를 입력해 정산 진행
 // - settled(정산완료): 정산 내역 표시
-export default function SettleButton({ fundingId, status, totalAmount, settledInfo }: Props) {
+export default function SettleButton({ fundingId, status, totalAmount, settledInfo, defaultBank }: Props) {
   const router = useRouter()
   const [showModal, setShowModal] = useState(false)
-  const [bankName, setBankName] = useState('')
-  const [accountNumber, setAccountNumber] = useState('')
-  const [accountHolder, setAccountHolder] = useState('')
+  const [bankName, setBankName] = useState(defaultBank?.bankName ?? '')
+  const [accountNumber, setAccountNumber] = useState(defaultBank?.accountNumber ?? '')
+  const [accountHolder, setAccountHolder] = useState(defaultBank?.accountHolder ?? '')
   const [error, setError] = useState('')
   const [isPending, startTransition] = useTransition()
 
