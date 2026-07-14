@@ -89,4 +89,16 @@ describe('changePassword (비밀번호 변경)', () => {
     expect('error' in res).toBe(true)
     expect(updateUserCalledWith).toBeNull()
   })
+
+  it('기존 비밀번호와 같으면 안내 메시지를 반환한다', async () => {
+    updateUserError = { message: 'New password should be different from the old password.' }
+    const res = await changePassword('newpass123')
+    expect(res).toEqual({ error: '기존 비밀번호와 다른 비밀번호를 입력해주세요' })
+  })
+
+  it('updateUser가 실패하면 친화적 에러를 반환한다', async () => {
+    updateUserError = { message: 'some internal error' }
+    const res = await changePassword('newpass123')
+    expect(res).toEqual({ error: '비밀번호 변경에 실패했어요. 잠시 후 다시 시도해주세요' })
+  })
 })
