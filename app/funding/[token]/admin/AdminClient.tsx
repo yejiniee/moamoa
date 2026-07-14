@@ -3,7 +3,6 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import Header from "@/components/ui/Header";
 import DeleteModal from "@/components/funding/DeleteModal";
 import SettleButton from "@/components/funding/SettleButton";
 import { formatKRW } from "@/lib/utils";
@@ -38,7 +37,6 @@ export default function AdminClient({
 
   return (
     <>
-      <Header />
       <main className="px-4 py-6 flex flex-col gap-5 pb-10">
         <div>
           <p className="text-lg font-semibold text-gray-700">{funding.title}</p>

@@ -5,7 +5,6 @@ import { loadTossPayments } from '@tosspayments/payment-sdk'
 import AmountSelector from '@/components/payment/AmountSelector'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
-import Header from '@/components/ui/Header'
 import { createPendingPayment } from './actions'
 
 type Props = { fundingId: string; fundingTitle: string }
@@ -51,7 +50,6 @@ export default function PayClient({ fundingId, fundingTitle }: Props) {
 
   return (
     <>
-      <Header />
       <main className="px-4 py-6 flex flex-col gap-5">
         <h1 className="text-xl font-bold text-gray-900">마음을 전해보세요 🎁</h1>
 

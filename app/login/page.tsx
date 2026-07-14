@@ -5,7 +5,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
-import Header from "@/components/ui/Header";
 import { signIn } from "./actions";
 
 function LoginForm() {
@@ -79,7 +78,6 @@ function LoginForm() {
 export default function LoginPage() {
   return (
     <>
-      <Header backHref="/" />
       <main className="min-h-[calc(100vh-3.5rem)] flex items-center justify-center px-4">
         <Suspense
           fallback={

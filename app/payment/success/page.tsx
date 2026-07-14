@@ -1,7 +1,6 @@
 import { notFound } from 'next/navigation'
 import { createServiceClient } from '@/lib/supabase/server'
 import SuccessClient from './SuccessClient'
-import Header from '@/components/ui/Header'
 
 type SearchParams = { paymentKey?: string; orderId?: string; amount?: string }
 
@@ -43,7 +42,6 @@ export default async function SuccessPage({ searchParams }: { searchParams: Sear
 
   return (
     <>
-      <Header />
       <main className="min-h-[calc(100vh-3.5rem)] flex items-center justify-center px-4">
       <div className="w-full max-w-md">
         <SuccessClient
