@@ -131,48 +131,6 @@ export default function CreatePage() {
       <main className="px-4 py-6">
         <h1 className="text-xl font-bold mb-6">펀딩 만들기</h1>
         <div className="flex flex-col gap-5">
-          {/* 이미지 업로드 */}
-          <div className="flex flex-col gap-1">
-            <label className="text-sm font-medium text-gray-700">이미지</label>
-            <div
-              className="relative border-2 border-dashed border-gray-200 rounded-2xl overflow-hidden cursor-pointer hover:border-rose-300 transition-colors aspect-[4/3]"
-              onClick={() => fileInputRef.current?.click()}
-            >
-              {imagePreview ? (
-                <Image
-                  src={imagePreview}
-                  alt="미리보기"
-                  fill
-                  sizes="(min-width: 430px) 400px, 100vw"
-                  className="object-cover"
-                />
-              ) : (
-                <div className="flex flex-col items-center justify-center h-full text-gray-400 gap-2">
-                  <span className="text-2xl">📷</span>
-                  <span className="text-xs">클릭해서 이미지 업로드</span>
-                </div>
-              )}
-              {imageUploading && (
-                <div className="absolute inset-0 bg-white/70 flex items-center justify-center">
-                  <span className="text-sm text-gray-500">업로드 중...</span>
-                </div>
-              )}
-            </div>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={handleImageChange}
-            />
-            {imageUrl && (
-              <p className="text-xs text-green-600">✓ 이미지 업로드 완료</p>
-            )}
-            {imageError && (
-              <p className="text-sm text-red-500">{imageError}</p>
-            )}
-          </div>
-
           <Input
             label={
               <>
@@ -216,6 +174,60 @@ export default function CreatePage() {
             placeholder="350,000"
             inputMode="numeric"
           />
+
+          {/* 이미지 업로드 */}
+          <div className="flex flex-col gap-1">
+            <label className="text-sm font-medium text-gray-700">이미지</label>
+            <div
+              className="relative w-24 h-24 border-2 border-dashed border-gray-200 rounded-2xl overflow-hidden cursor-pointer hover:border-rose-300 transition-colors"
+              onClick={() => fileInputRef.current?.click()}
+            >
+              {imagePreview ? (
+                <Image
+                  src={imagePreview}
+                  alt="미리보기"
+                  fill
+                  sizes="96px"
+                  className="object-cover"
+                />
+              ) : (
+                <div className="flex items-center justify-center h-full text-gray-400">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="28"
+                    height="28"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z" />
+                    <circle cx="12" cy="13" r="3" />
+                  </svg>
+                </div>
+              )}
+              {imageUploading && (
+                <div className="absolute inset-0 bg-white/70 flex items-center justify-center">
+                  <span className="text-xs text-gray-500">업로드 중...</span>
+                </div>
+              )}
+            </div>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleImageChange}
+            />
+            {imageUrl && (
+              <p className="text-xs text-green-600">✓ 이미지 업로드 완료</p>
+            )}
+            {imageError && (
+              <p className="text-sm text-red-500">{imageError}</p>
+            )}
+          </div>
 
           {error && <p className="text-sm text-red-500">{error}</p>}
           <Button
