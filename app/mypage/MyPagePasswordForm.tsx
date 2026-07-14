@@ -1,10 +1,8 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import Input from "@/components/ui/Input";
 import { changePassword } from "./actions";
-
-const inputCls =
-  "h-[52px] rounded-xl border border-gray-200 px-4 text-sm outline-none focus:border-rose-400";
 
 export default function MyPagePasswordForm() {
   const [password, setPassword] = useState("");
@@ -38,19 +36,17 @@ export default function MyPagePasswordForm() {
 
   return (
     <div className="flex flex-col gap-3">
-      <input
+      <Input
         type="password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
         placeholder="새 비밀번호 (8자 이상)"
-        className={inputCls}
       />
-      <input
+      <Input
         type="password"
         value={confirm}
         onChange={(e) => setConfirm(e.target.value)}
         placeholder="새 비밀번호 확인"
-        className={inputCls}
       />
       {error && <p className="text-sm text-red-500">{error}</p>}
       {done && (
