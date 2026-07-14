@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { generateShareToken, formatKRW, calcPercent } from './utils'
+import { generateShareToken, formatKRW, calcPercent, isFundingEnded } from './utils'
 
 describe('generateShareToken', () => {
   it('8자 문자열을 반환한다', () => {
@@ -47,5 +47,20 @@ describe('calcPercent', () => {
 
   it('후원이 전혀 없으면 0%를 반환한다', () => {
     expect(calcPercent(0, 50000)).toBe(0)
+  })
+})
+
+describe('isFundingEnded (펀딩 종료 여부)', () => {
+  it('진행중(active)은 종료가 아니다', () => {
+    expect(isFundingEnded('active')).toBe(false)
+  })
+
+  it('마감(closed)은 종료다', () => {
+    expect(isFundingEnded('closed')).toBe(true)
+  })
+
+  // 회귀 방지: 정산완료(settled)가 목록 카드에서 종료로 처리되지 않던 버그
+  it('정산완료(settled)도 종료다', () => {
+    expect(isFundingEnded('settled')).toBe(true)
   })
 })

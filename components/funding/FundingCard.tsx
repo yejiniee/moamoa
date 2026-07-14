@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import ProgressBar from '@/components/ui/ProgressBar'
-import { formatKRW, calcPercent } from '@/lib/utils'
+import { formatKRW, calcPercent, isFundingEnded } from '@/lib/utils'
 import type { Funding } from '@/lib/supabase/types'
 
 type Props = {
@@ -21,11 +21,11 @@ function calcDday(endDate: string): string {
 export default function FundingCard({ funding, totalRaised, totalTarget, priority = false }: Props) {
   const percent = calcPercent(totalRaised, totalTarget)
   const dday = calcDday(funding.end_date)
-  const isClosed = funding.status === 'closed'
+  const isEnded = isFundingEnded(funding.status)
 
   return (
     <Link href={`/funding/${funding.share_token}`} className="block">
-      <div className={`bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-md transition-shadow ${isClosed ? 'opacity-50 grayscale' : ''}`}>
+      <div className={`bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-md transition-shadow ${isEnded ? 'opacity-50 grayscale' : ''}`}>
         <div className="relative h-40 bg-gray-100">
           {funding.image_url ? (
             <Image src={funding.image_url} alt={funding.title} fill sizes="(min-width: 430px) 215px, 50vw" className="object-cover" priority={priority} />
@@ -36,11 +36,11 @@ export default function FundingCard({ funding, totalRaised, totalTarget, priorit
           )}
           <div className="absolute top-3 right-3">
             <span className={`text-xs font-semibold px-2 py-1 rounded-full ${
-              isClosed
+              isEnded
                 ? 'bg-gray-200 text-gray-500'
                 : 'bg-rose-100 text-rose-600'
             }`}>
-              {isClosed ? '종료' : dday}
+              {isEnded ? '종료' : dday}
             </span>
           </div>
         </div>

@@ -5,6 +5,7 @@ import FundingRealtime from "./FundingRealtime";
 import Button from "@/components/ui/Button";
 import Header from "@/components/ui/Header";
 import CloseButton from "@/components/funding/CloseButton";
+import { isFundingEnded } from "@/lib/utils";
 
 function calcDday(endDate: string): string {
   const end = new Date(endDate);
@@ -58,7 +59,7 @@ export default async function FundingPage({
 
   const dday = calcDday(funding.end_date);
   // 마감(closed)이든 정산완료(settled)든 진행중이 아니면 종료 상태
-  const isEnded = funding.status !== "active";
+  const isEnded = isFundingEnded(funding.status);
   const totalTarget = (gifts ?? []).reduce(
     (sum, g) => sum + g.target_amount,
     0,

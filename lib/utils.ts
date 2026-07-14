@@ -1,7 +1,15 @@
 import { nanoid } from 'nanoid'
+import type { FundingStatus } from '@/lib/supabase/types'
 
 export function generateShareToken(): string {
   return nanoid(8)
+}
+
+// 펀딩이 종료 상태인지 판단한다.
+// 상태 흐름: active(진행중) → closed(마감) → settled(정산완료)
+// 진행중이 아니면(=마감·정산완료) 모두 종료로 취급한다.
+export function isFundingEnded(status: FundingStatus): boolean {
+  return status !== 'active'
 }
 
 export function formatKRW(amount: number): string {
