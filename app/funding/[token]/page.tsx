@@ -70,7 +70,7 @@ export default async function FundingPage({
     <>
       <Header
         backHref="/funding"
-        hideLogout
+        hideMyPage
         right={
           <>
             {isOwner && (
