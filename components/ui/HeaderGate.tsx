@@ -22,5 +22,5 @@ function isExcluded(pathname: string) {
 export default function HeaderGate() {
   const pathname = usePathname()
   if (isExcluded(pathname)) return null
-  return <Header backHref={BACK_HREF[pathname]} />
+  return <Header backHref={BACK_HREF[pathname]} hideMyPage={pathname === '/mypage'} />
 }
