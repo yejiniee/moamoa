@@ -142,7 +142,7 @@ export default function CreatePage() {
           <div className="flex flex-col gap-1">
             <label className="text-sm font-medium text-gray-700">설명</label>
             <textarea
-              className="border border-gray-300 rounded-lg px-3 py-2 text-base outline-none focus:ring-2 focus:ring-rose-300 resize-none"
+              className="border border-[#E8EAED] rounded-[12px] px-3 py-2 text-base outline-none transition-colors duration-100 focus:border-rose-400 focus:ring-2 focus:ring-rose-100 resize-none"
               rows={3}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
