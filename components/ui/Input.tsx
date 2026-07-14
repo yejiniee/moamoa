@@ -49,7 +49,7 @@ export default function Input({ label, error, hint, className = '', id, type, ..
             type="button"
             tabIndex={-1}
             onClick={() => setVisible((v) => !v)}
-            className="absolute right-2 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full text-gray-400 transition-colors duration-100 hover:bg-gray-100 hover:text-gray-600 active:bg-gray-200"
+            className="absolute right-2 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center text-gray-400 transition-colors duration-100 hover:text-gray-600 active:text-gray-800"
             aria-label={visible ? '비밀번호 숨기기' : '비밀번호 보기'}
           >
             {visible ? (
