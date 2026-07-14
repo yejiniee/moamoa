@@ -21,6 +21,7 @@ jobs:
       NEXT_PUBLIC_KAKAO_JS_KEY: ${{ secrets.NEXT_PUBLIC_KAKAO_JS_KEY }}
       LHCI_TEST_EMAIL: ${{ secrets.LHCI_TEST_EMAIL }}
       LHCI_TEST_PASSWORD: ${{ secrets.LHCI_TEST_PASSWORD }}
+      SAMPLE_FUNDING_TOKEN: ${{ secrets.SAMPLE_FUNDING_TOKEN }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -62,6 +63,9 @@ jobs:
 
       - name: PR 브랜치 설치 + 빌드
         run: npm ci && npm run build
+
+      - name: 샘플 펀딩 active로 리셋
+        run: node scripts/lighthouse-seed-funding.mjs
 
       - name: PR 브랜치 서빙 시작 (4001)
         run: |
