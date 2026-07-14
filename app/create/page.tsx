@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
-import Header from "@/components/ui/Header";
 import Toast from "@/components/ui/Toast";
 import { uploadFundingImage, createFunding } from "./actions";
 
@@ -127,7 +126,6 @@ export default function CreatePage() {
 
   return (
     <>
-      <Header backHref="/" />
       <main className="px-4 py-6">
         <h1 className="text-xl font-bold mb-6">펀딩 만들기</h1>
         <div className="flex flex-col gap-5">

@@ -4,7 +4,6 @@ import { useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Input from "@/components/ui/Input";
-import Header from "@/components/ui/Header";
 import { uploadFundingImage } from "@/app/create/actions";
 import { updateFunding } from "./actions";
 import type { Funding, Gift } from "@/lib/supabase/types";
@@ -96,7 +95,6 @@ export default function EditClient({ token, funding, gift }: Props) {
 
   return (
     <>
-      <Header />
       <main className="px-4 py-6">
         <h1 className="text-xl font-bold mb-6">펀딩 수정하기</h1>
         <div className="flex flex-col gap-5">

@@ -4,7 +4,6 @@ import { Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import Button from '@/components/ui/Button'
-import Header from '@/components/ui/Header'
 
 function FailContent() {
   const searchParams = useSearchParams()
@@ -31,7 +30,6 @@ function FailContent() {
 export default function FailPage() {
   return (
     <>
-      <Header />
       <main className="min-h-[calc(100vh-3.5rem)] flex items-center justify-center px-4">
         <Suspense fallback={<div className="w-full max-w-md h-60 bg-white rounded-2xl animate-pulse" />}>
           <FailContent />

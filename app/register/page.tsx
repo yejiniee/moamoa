@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
-import Header from '@/components/ui/Header'
 import { sendSignUpOtp, verifyOtpAndSetPassword } from './actions'
 
 const PASSWORD_PATTERN = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[^A-Za-z0-9]).{6,}$/
@@ -59,7 +58,6 @@ export default function RegisterPage() {
 
   return (
     <>
-      <Header backHref="/login" />
       <main className="min-h-[calc(100vh-3.5rem)] flex items-center justify-center px-4">
       <div className="w-full max-w-md bg-white rounded-2xl p-8 flex flex-col gap-5">
         <div className="text-center mb-2">

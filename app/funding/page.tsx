@@ -2,7 +2,6 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import FundingCard from '@/components/funding/FundingCard'
 import Button from '@/components/ui/Button'
-import Header from '@/components/ui/Header'
 
 export default async function FundingFeedPage() {
   const supabase = await createClient()
@@ -42,7 +41,6 @@ export default async function FundingFeedPage() {
 
   return (
     <>
-      <Header backHref="/" />
       <main className="px-4 py-6">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-xl font-bold text-gray-900">내 펀딩</h1>
