@@ -5,6 +5,7 @@ export type PaymentStatus = 'pending' | 'confirmed' | 'failed'
 export type Funding = Database['public']['Tables']['fundings']['Row']
 export type Gift = Database['public']['Tables']['gifts']['Row']
 export type Payment = Database['public']['Tables']['payments']['Row']
+export type Profile = Database['public']['Tables']['profiles']['Row']
 
 export type Database = {
   public: {
@@ -123,6 +124,30 @@ export type Database = {
           payment_key?: string | null
           status?: PaymentStatus
           created_at?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          user_id: string
+          bank_name: string | null
+          account_number: string | null
+          account_holder: string | null
+          updated_at: string
+        }
+        Insert: {
+          user_id: string
+          bank_name?: string | null
+          account_number?: string | null
+          account_holder?: string | null
+          updated_at?: string
+        }
+        Update: {
+          user_id?: string
+          bank_name?: string | null
+          account_number?: string | null
+          account_holder?: string | null
+          updated_at?: string
         }
         Relationships: []
       }
