@@ -73,15 +73,24 @@ export async function settleFunding(fundingId: string, bank: BankInfo): Promise<
 
   const settledAmount = (payments ?? []).reduce((sum, p) => sum + p.amount, 0)
 
+  // 계좌 PII는 소유자 전용 settlements 테이블에 기록한다.
+  const { error: settlementError } = await supabase
+    .from('settlements')
+    .upsert({
+      funding_id: fundingId,
+      bank_name: bankName,
+      account_number: accountNumber,
+      account_holder: accountHolder,
+    })
+
+  if (settlementError) return { error: settlementError.message }
+
   const { error } = await supabase
     .from('fundings')
     .update({
       status: 'settled',
       settled_at: new Date().toISOString(),
       settled_amount: settledAmount,
-      settle_bank_name: bankName,
-      settle_account_number: accountNumber,
-      settle_account_holder: accountHolder,
     })
     .eq('id', fundingId)
 

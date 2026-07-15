@@ -15,13 +15,19 @@ create table if not exists fundings (
   share_token           text unique not null,
   -- active(진행중) → closed(마감) → settled(정산완료)
   status                text not null default 'active' check (status in ('active', 'closed', 'settled')),
-  -- 정산(인출) 기록
+  -- 정산(인출) 기록 — 금액/시각만 (계좌 PII는 settlements 테이블로 분리)
   settled_at            timestamptz,
   settled_amount        integer,
-  settle_bank_name      text,
-  settle_account_number text,
-  settle_account_holder text,
   created_at            timestamptz not null default now()
+);
+
+-- 정산 계좌(PII)는 소유자만 볼 수 있도록 별도 테이블로 분리한다.
+create table if not exists settlements (
+  funding_id     uuid primary key references fundings(id) on delete cascade,
+  bank_name      text not null,
+  account_number text not null,
+  account_holder text not null,
+  created_at     timestamptz not null default now()
 );
 
 create table if not exists gifts (
@@ -50,9 +56,10 @@ create table if not exists payments (
 -- Row Level Security 활성화
 -- ============================================================
 
-alter table fundings  enable row level security;
-alter table gifts     enable row level security;
-alter table payments  enable row level security;
+alter table fundings    enable row level security;
+alter table gifts       enable row level security;
+alter table payments    enable row level security;
+alter table settlements enable row level security;
 
 -- ============================================================
 -- RLS 정책 — fundings
@@ -89,11 +96,27 @@ create policy "gifts_update_service"
   using (auth.role() = 'service_role');
 
 -- ============================================================
+-- RLS 정책 — settlements (정산 계좌 = 소유자 전용)
+-- ============================================================
+
+-- 조회는 해당 펀딩 생성자만. 쓰기 정책 없음 → service_role만 기록 가능.
+create policy "settlements_select_owner"
+  on settlements for select
+  using (
+    exists (
+      select 1 from fundings f
+      where f.id = settlements.funding_id
+        and f.creator_user_id = auth.uid()
+    )
+  );
+
+-- ============================================================
 -- RLS 정책 — payments
 -- ============================================================
 
--- 같은 funding_id의 confirmed 결제만 조회 가능 (후원자 목록 표시)
-create policy "payments_select_same_funding"
+-- confirmed 결제만 조회 가능 (후원자 목록 표시).
+-- 노출 컬럼은 아래 컬럼 단위 GRANT로 제한한다(payment_key/order_id 제외).
+create policy "payments_select_confirmed"
   on payments for select
   using (status = 'confirmed');
 
@@ -114,8 +137,15 @@ create policy "payments_update_service"
 
 grant select on public.fundings  to anon, authenticated;
 grant select on public.gifts     to anon, authenticated;
-grant select on public.payments  to anon, authenticated;
 grant insert on public.payments  to anon, authenticated;
+
+-- payments는 안전한 컬럼만 노출 (payment_key/order_id 제외)
+grant select
+  (id, funding_id, participant_name, message, amount, status, created_at)
+  on public.payments to anon, authenticated;
+
+-- settlements(계좌 PII)는 authenticated에게만 grant하고 RLS로 소유자만 통과
+grant select on public.settlements to authenticated;
 
 -- ============================================================
 -- 인덱스

@@ -29,6 +29,21 @@ export default async function AdminPage({ params }: { params: { token: string } 
 
   const totalAmount = (payments ?? []).reduce((sum, p) => sum + p.amount, 0)
 
+  // 정산 완료된 펀딩의 기록된 계좌(소유자 전용 settlements 테이블)
+  const { data: settlement } = await supabase
+    .from('settlements')
+    .select('bank_name, account_number, account_holder')
+    .eq('funding_id', funding.id)
+    .maybeSingle()
+
+  const settledBank = settlement
+    ? {
+        bankName: settlement.bank_name,
+        accountNumber: settlement.account_number,
+        accountHolder: settlement.account_holder,
+      }
+    : undefined
+
   const { data: profile } = await serverClient
     .from('profiles')
     .select('bank_name, account_number, account_holder')
@@ -49,6 +64,7 @@ export default async function AdminPage({ params }: { params: { token: string } 
       payments={payments ?? []}
       totalAmount={totalAmount}
       defaultBank={defaultBank}
+      settledBank={settledBank}
     />
   )
 }

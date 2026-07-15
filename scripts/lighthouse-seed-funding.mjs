@@ -52,13 +52,13 @@ async function main() {
         end_date: endDate,
         settled_at: null,
         settled_amount: null,
-        settle_bank_name: null,
-        settle_account_number: null,
-        settle_account_holder: null,
       })
       .eq('id', existing.id)
     if (error) throw new Error(`샘플 펀딩 초기화 실패: ${error.message}`)
     fundingId = existing.id
+
+    // 계좌 PII는 settlements 테이블로 분리됨 — 리셋 시 정산 기록도 함께 정리
+    await supabase.from('settlements').delete().eq('funding_id', fundingId)
     console.log(`[lighthouse-seed] 기존 샘플 펀딩(${token})을 active로 리셋했습니다.`)
   } else {
     const { data: created, error } = await supabase
