@@ -1,5 +1,6 @@
 'use server'
 
+import { revalidatePath } from 'next/cache'
 import { createServerSupabaseClient, createServiceClient } from '@/lib/supabase/server'
 import { generateShareToken } from '@/lib/utils'
 
@@ -71,6 +72,10 @@ export async function createFunding(data: {
   )
 
   if (giftsError) return { error: giftsError.message }
+
+  // 생성 직후 상세 → 뒤로가기로 목록에 왔을 때 새 펀딩이 바로 보이도록
+  // 내 펀딩 리스트 캐시를 무효화한다. (deleteFunding과 동일한 이유)
+  revalidatePath('/funding')
 
   return { shareToken }
 }
