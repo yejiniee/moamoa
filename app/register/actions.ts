@@ -55,6 +55,11 @@ export async function verifyOtpAndSetPassword(
   otp: string,
   password: string
 ): Promise<AuthResult> {
+  // 비밀번호 정책을 changePassword와 동일하게 서버에서도 검증한다.
+  if (!password || password.length < 8) {
+    return { error: '비밀번호는 8자 이상이어야 합니다' } as ErrorResult
+  }
+
   const supabase = await createServerSupabaseClient()
 
   const { error: verifyError } = await supabase.auth.verifyOtp({
