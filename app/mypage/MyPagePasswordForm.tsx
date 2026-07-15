@@ -5,6 +5,7 @@ import Input from "@/components/ui/Input";
 import { changePassword } from "./actions";
 
 export default function MyPagePasswordForm() {
+  const [current, setCurrent] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [error, setError] = useState("");
@@ -14,6 +15,10 @@ export default function MyPagePasswordForm() {
   const handleChange = () => {
     setError("");
     setDone(false);
+    if (!current) {
+      setError("현재 비밀번호를 입력해주세요");
+      return;
+    }
     if (password.length < 8) {
       setError("비밀번호는 8자 이상이어야 합니다");
       return;
@@ -23,11 +28,12 @@ export default function MyPagePasswordForm() {
       return;
     }
     startTransition(async () => {
-      const res = await changePassword(password);
+      const res = await changePassword(current, password);
       if ("error" in res) {
         setError(res.error);
         return;
       }
+      setCurrent("");
       setPassword("");
       setConfirm("");
       setDone(true);
@@ -36,6 +42,12 @@ export default function MyPagePasswordForm() {
 
   return (
     <div className="flex flex-col gap-3">
+      <Input
+        type="password"
+        value={current}
+        onChange={(e) => setCurrent(e.target.value)}
+        placeholder="현재 비밀번호"
+      />
       <Input
         type="password"
         value={password}

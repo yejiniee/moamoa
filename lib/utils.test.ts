@@ -2,8 +2,8 @@ import { describe, it, expect } from 'vitest'
 import { generateShareToken, formatKRW, calcPercent, isFundingEnded, safeRedirect } from './utils'
 
 describe('generateShareToken', () => {
-  it('8자 문자열을 반환한다', () => {
-    expect(generateShareToken()).toHaveLength(8)
+  it('12자 문자열을 반환한다', () => {
+    expect(generateShareToken()).toHaveLength(12)
   })
 
   it('호출마다 다른 값을 반환한다', () => {

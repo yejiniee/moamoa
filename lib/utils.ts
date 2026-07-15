@@ -1,8 +1,10 @@
 import { nanoid } from 'nanoid'
 import type { FundingStatus } from '@/lib/supabase/types'
 
+// 공유 토큰은 URL로 노출되므로 열거(enumeration)를 어렵게 하려고 충분한 길이를 쓴다.
+// nanoid 12자 = 64^12 ≈ 4.7e21 조합.
 export function generateShareToken(): string {
-  return nanoid(8)
+  return nanoid(12)
 }
 
 // 펀딩이 종료 상태인지 판단한다.
