@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Analytics } from "@vercel/analytics/next";
 import NextTopLoader from "nextjs-toploader";
 import KakaoInit from "@/components/KakaoInit";
 import HeaderGate from "@/components/ui/HeaderGate";
@@ -30,6 +31,7 @@ export default function RootLayout({
           {children}
         </div>
         <KakaoInit />
+        <Analytics />
       </body>
     </html>
   );
