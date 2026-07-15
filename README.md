@@ -29,7 +29,7 @@
 <table>
   <tr>
     <td align="center" width="50%">
-      <img width="100%" alt="로그인 후 펀딩리스트 확인" src="https://github.com/user-attachments/assets/21d79224-f841-4b42-b1e9-5bce1a824ff8" />
+      <img width="100%" alt="로그인 후 펀딩리스트 확인" src="https://github.com/user-attachments/assets/294d0156-ed9d-412e-ae5c-d823b6605d1c" />
     </td>
     <td valign="top" width="50%">
       <br />
@@ -41,7 +41,7 @@
 <table>
   <tr>
     <td align="center" width="50%">
-      <img width="100%" alt="펀딩 생성하기" src="https://github.com/user-attachments/assets/d266b1ec-307c-4e60-8dbc-8c168e682b2e" />
+      <img width="100%" alt="펀딩 생성하기" src="https://github.com/user-attachments/assets/a77f9e83-35ae-42ce-bd09-bf719b33ea2e" />
     </td>
     <td valign="top" width="50%">
       <br />
