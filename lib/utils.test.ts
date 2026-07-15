@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { generateShareToken, formatKRW, calcPercent, isFundingEnded } from './utils'
+import { generateShareToken, formatKRW, calcPercent, isFundingEnded, safeRedirect } from './utils'
 
 describe('generateShareToken', () => {
   it('8자 문자열을 반환한다', () => {
@@ -62,5 +62,27 @@ describe('isFundingEnded (펀딩 종료 여부)', () => {
   // 회귀 방지: 정산완료(settled)가 목록 카드에서 종료로 처리되지 않던 버그
   it('정산완료(settled)도 종료다', () => {
     expect(isFundingEnded('settled')).toBe(true)
+  })
+})
+
+describe('safeRedirect (오픈 리다이렉트 방지)', () => {
+  it('내부 경로는 그대로 허용한다', () => {
+    expect(safeRedirect('/mypage')).toBe('/mypage')
+    expect(safeRedirect('/funding/abc/admin')).toBe('/funding/abc/admin')
+  })
+
+  it('값이 없으면 루트(/)로 보낸다', () => {
+    expect(safeRedirect(null)).toBe('/')
+    expect(safeRedirect(undefined)).toBe('/')
+    expect(safeRedirect('')).toBe('/')
+  })
+
+  // 회귀 방지: 외부 사이트로 나가는 값은 모두 차단해야 한다
+  it('외부/프로토콜상대 URL은 차단하고 루트로 보낸다', () => {
+    expect(safeRedirect('//evil.com')).toBe('/')
+    expect(safeRedirect('https://evil.com')).toBe('/')
+    expect(safeRedirect('http://evil.com')).toBe('/')
+    expect(safeRedirect('/\\evil.com')).toBe('/')
+    expect(safeRedirect('evil.com')).toBe('/')
   })
 })
