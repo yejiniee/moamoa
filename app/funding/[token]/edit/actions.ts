@@ -41,6 +41,9 @@ export async function updateFunding(
 
   if (fundingError) return { error: fundingError.message }
 
+  // 이 gift가 실제로 이 펀딩 소속인지까지 검증한다(IDOR 방지).
+  // service_role은 RLS를 우회하므로 id만으로 수정하면 타인 펀딩의 gift도
+  // 바뀔 수 있어, funding_id 조건을 함께 걸어 범위를 제한한다.
   const { error: giftError } = await supabase
     .from('gifts')
     .update({
@@ -49,6 +52,7 @@ export async function updateFunding(
       description: data.gift.description,
     })
     .eq('id', data.gift.id)
+    .eq('funding_id', funding.id)
 
   if (giftError) return { error: giftError.message }
 

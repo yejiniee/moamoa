@@ -5,12 +5,13 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
+import { safeRedirect } from "@/lib/utils";
 import { signIn } from "./actions";
 
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirectTo = searchParams.get("redirect") || "/";
+  const redirectTo = safeRedirect(searchParams.get("redirect"));
 
   const [isPending, startTransition] = useTransition();
   const [email, setEmail] = useState("");

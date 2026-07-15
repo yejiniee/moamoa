@@ -16,6 +16,15 @@ export function formatKRW(amount: number): string {
   return `${amount.toLocaleString('ko-KR')}원`
 }
 
+// 오픈 리다이렉트 방지: 같은 사이트 내부 경로만 허용한다.
+// "//evil.com", "https://evil.com", "/\evil.com" 등 외부로 나가는 값은 버린다.
+export function safeRedirect(value: string | null | undefined): string {
+  if (!value) return '/'
+  if (!value.startsWith('/')) return '/'
+  if (value.startsWith('//') || value.startsWith('/\\')) return '/'
+  return value
+}
+
 export function calcPercent(current: number, total: number): number {
   if (total <= 0 || current <= 0) return 0
   const percent = (current / total) * 100
