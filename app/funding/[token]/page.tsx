@@ -5,6 +5,7 @@ import FundingRealtime from "./FundingRealtime";
 import Button from "@/components/ui/Button";
 import Header from "@/components/ui/Header";
 import CloseButton from "@/components/funding/CloseButton";
+import ShareButton from "@/components/funding/ShareButton";
 import { isFundingEnded } from "@/lib/utils";
 
 function calcDday(endDate: string): string {
@@ -74,6 +75,12 @@ export default async function FundingPage({
         hideMyPage
         right={
           <>
+            <ShareButton
+              variant="icon"
+              shareToken={params.token}
+              title={funding.title}
+              description={funding.description}
+            />
             {isOwner && (
               <Link
                 href={`/funding/${params.token}/admin`}
