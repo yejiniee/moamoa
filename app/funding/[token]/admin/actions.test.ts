@@ -17,7 +17,7 @@ function matches(row: Row, filters: [string, unknown][]) {
 function makeServiceClient() {
   const builder = (table: string) => {
     const state = {
-      op: 'select' as 'select' | 'update',
+      op: 'select' as 'select' | 'update' | 'delete',
       filters: [] as [string, unknown][],
       payload: null as Row | null,
     }
@@ -30,6 +30,9 @@ function makeServiceClient() {
         })
         return { data: null, error: null }
       }
+      if (state.op === 'delete') {
+        return { data: null, error: null }
+      }
       const filtered = rows.filter((r) => matches(r, state.filters))
       if (single) {
         if (filtered.length === 0) return { data: null, error: { message: 'not found' } }
@@ -40,6 +43,7 @@ function makeServiceClient() {
     const b: Record<string, unknown> = {
       select() { state.op = 'select'; return b },
       update(payload: Row) { state.op = 'update'; state.payload = payload; return b },
+      delete() { state.op = 'delete'; return b },
       eq(col: string, val: unknown) { state.filters.push([col, val]); return b },
       order() { return b },
       single() { return Promise.resolve(run(true)) },
@@ -59,11 +63,13 @@ vi.mock('@/lib/supabase/server', () => ({
   createServiceClient: () => makeServiceClient(),
 }))
 
-vi.mock('next/cache', () => ({ revalidatePath: () => {} }))
+vi.mock('next/cache', () => ({ revalidatePath: vi.fn() }))
 
-const { closeFunding, settleFunding } = await import('./actions')
+const { revalidatePath } = await import('next/cache')
+const { closeFunding, settleFunding, deleteFunding } = await import('./actions')
 
 beforeEach(() => {
+  vi.mocked(revalidatePath).mockClear()
   currentUserId = 'owner'
   funding = {
     id: 'f1',
@@ -142,5 +148,21 @@ describe('settleFunding (정산)', () => {
     const res = await settleFunding('f1', validBank)
     expect('error' in res).toBe(true)
     expect(funding.status).toBe('closed')
+  })
+})
+
+describe('deleteFunding (삭제)', () => {
+  it('삭제에 성공하면 내 펀딩 리스트(/funding) 캐시를 무효화한다', async () => {
+    const res = await deleteFunding('tok')
+    expect(res).toEqual({ success: true })
+    // 삭제 후 리스트 페이지가 즉시 반영되려면 /funding 경로를 revalidate 해야 한다
+    expect(revalidatePath).toHaveBeenCalledWith('/funding')
+  })
+
+  it('소유자가 아니면 삭제할 수 없다', async () => {
+    currentUserId = 'stranger'
+    const res = await deleteFunding('tok')
+    expect('error' in res).toBe(true)
+    expect(revalidatePath).not.toHaveBeenCalled()
   })
 })
