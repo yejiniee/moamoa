@@ -3,8 +3,6 @@ import { describe, it, expect, beforeEach, vi } from 'vitest'
 // createServerSupabaseClient(auth) / createServiceClient(DB)를 인메모리 가짜로 대체한다.
 // 회귀 방지: 펀딩 생성 후 목록(/funding) 캐시가 무효화되는지 검증한다.
 
-type Row = Record<string, unknown>
-
 let currentUserId: string | null
 let insertError: { message: string } | null
 
