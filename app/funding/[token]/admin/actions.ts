@@ -117,5 +117,8 @@ export async function deleteFunding(token: string): Promise<{ success: true } | 
 
   const { error } = await supabase.from('fundings').delete().eq('id', funding.id)
   if (error) return { error: error.message }
+
+  // 삭제 후 내 펀딩 리스트가 즉시 반영되도록 캐시를 무효화한다
+  revalidatePath('/funding')
   return { success: true as const }
 }
