@@ -5,14 +5,14 @@ import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
 import FundingProgress from "@/components/funding/FundingProgress";
 import DonorRolling from "@/components/funding/DonorRolling";
-import type { Gift, Payment } from "@/lib/supabase/types";
+import type { Gift, PublicPayment } from "@/lib/supabase/types";
 
 type Props = {
   fundingId: string;
   imageUrl: string | null;
   title: string;
   gifts: Gift[];
-  initialPayments: Payment[];
+  initialPayments: PublicPayment[];
 };
 
 export default function FundingRealtime({
@@ -22,7 +22,7 @@ export default function FundingRealtime({
   gifts,
   initialPayments,
 }: Props) {
-  const [payments, setPayments] = useState<Payment[]>(initialPayments);
+  const [payments, setPayments] = useState<PublicPayment[]>(initialPayments);
   const [showLightbox, setShowLightbox] = useState(false);
 
   const totalGoal = gifts.reduce((sum, g) => sum + g.target_amount, 0);
@@ -43,12 +43,12 @@ export default function FundingRealtime({
         },
         (payload) => {
           if (payload.eventType === "INSERT") {
-            const newPayment = payload.new as Payment;
+            const newPayment = payload.new as PublicPayment;
             if (newPayment.status === "confirmed") {
               setPayments((prev) => [...prev, newPayment]);
             }
           } else if (payload.eventType === "UPDATE") {
-            const updated = payload.new as Payment;
+            const updated = payload.new as PublicPayment;
             setPayments((prev) => {
               const exists = prev.some((p) => p.id === updated.id);
               if (updated.status === "confirmed") {

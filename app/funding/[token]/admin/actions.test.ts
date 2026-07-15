@@ -7,6 +7,7 @@ type Row = Record<string, unknown>
 
 let funding: Row
 let payments: Row[]
+let settlements: Row[]
 let currentUserId: string | null
 
 function matches(row: Row, filters: [string, unknown][]) {
@@ -21,7 +22,8 @@ function makeServiceClient() {
       filters: [] as [string, unknown][],
       payload: null as Row | null,
     }
-    const rowsFor = () => (table === 'fundings' ? [funding] : payments)
+    const rowsFor = () =>
+      table === 'fundings' ? [funding] : table === 'settlements' ? settlements : payments
     const run = (single: boolean) => {
       const rows = rowsFor()
       if (state.op === 'update') {
@@ -43,6 +45,14 @@ function makeServiceClient() {
     const b: Record<string, unknown> = {
       select() { state.op = 'select'; return b },
       update(payload: Row) { state.op = 'update'; state.payload = payload; return b },
+      upsert(payload: Row) {
+        // settlements(funding_id PK) upsert 시뮬레이션
+        const rows = rowsFor()
+        const idx = rows.findIndex((r) => r.funding_id === payload.funding_id)
+        if (idx >= 0) Object.assign(rows[idx], payload)
+        else rows.push({ ...payload })
+        return Promise.resolve({ data: null, error: null })
+      },
       delete() { state.op = 'delete'; return b },
       eq(col: string, val: unknown) { state.filters.push([col, val]); return b },
       order() { return b },
@@ -84,6 +94,7 @@ beforeEach(() => {
     { funding_id: 'f1', amount: 2000, status: 'confirmed' },
     { funding_id: 'f1', amount: 9999, status: 'pending' }, // 미확정 결제는 정산 금액에서 제외
   ]
+  settlements = []
 })
 
 const validBank = { bankName: '토스뱅크', accountNumber: '100012345678', accountHolder: '홍길동' }
@@ -123,10 +134,16 @@ describe('settleFunding (정산)', () => {
     expect(res).toEqual({ success: true })
     expect(funding.status).toBe('settled')
     expect(funding.settled_amount).toBe(5000) // confirmed 3000 + 2000, pending 제외
-    expect(funding.settle_bank_name).toBe('토스뱅크')
-    expect(funding.settle_account_number).toBe('100012345678')
-    expect(funding.settle_account_holder).toBe('홍길동')
     expect(funding.settled_at).toBeTruthy()
+    // 계좌 PII는 fundings가 아니라 settlements 테이블에 기록된다
+    expect(funding.settle_bank_name).toBeUndefined()
+    expect(settlements).toHaveLength(1)
+    expect(settlements[0]).toMatchObject({
+      funding_id: 'f1',
+      bank_name: '토스뱅크',
+      account_number: '100012345678',
+      account_holder: '홍길동',
+    })
   })
 
   it('이미 정산된 펀딩은 다시 정산할 수 없다', async () => {

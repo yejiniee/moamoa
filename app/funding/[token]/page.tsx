@@ -52,7 +52,8 @@ export default async function FundingPage({
       .order("created_at"),
     supabase
       .from("payments")
-      .select("*")
+      // 내부 식별자(order_id·payment_key)는 클라이언트로 내려보내지 않는다
+      .select("id, funding_id, participant_name, message, amount, status, created_at")
       .eq("funding_id", funding.id)
       .eq("status", "confirmed")
       .order("created_at", { ascending: false }),

@@ -6,6 +6,11 @@ export type Funding = Database['public']['Tables']['fundings']['Row']
 export type Gift = Database['public']['Tables']['gifts']['Row']
 export type Payment = Database['public']['Tables']['payments']['Row']
 export type Profile = Database['public']['Tables']['profiles']['Row']
+export type Settlement = Database['public']['Tables']['settlements']['Row']
+
+// 클라이언트에 노출되는 결제 정보(내부 식별자 payment_key/order_id 제외).
+// 공개 페이지/실시간 후원자 목록에서 사용한다.
+export type PublicPayment = Omit<Payment, 'order_id' | 'payment_key'>
 
 export type Database = {
   public: {
@@ -22,9 +27,6 @@ export type Database = {
           status: FundingStatus
           settled_at: string | null
           settled_amount: number | null
-          settle_bank_name: string | null
-          settle_account_number: string | null
-          settle_account_holder: string | null
           created_at: string
         }
         Insert: {
@@ -38,9 +40,6 @@ export type Database = {
           status?: FundingStatus
           settled_at?: string | null
           settled_amount?: number | null
-          settle_bank_name?: string | null
-          settle_account_number?: string | null
-          settle_account_holder?: string | null
           created_at?: string
         }
         Update: {
@@ -54,9 +53,6 @@ export type Database = {
           status?: FundingStatus
           settled_at?: string | null
           settled_amount?: number | null
-          settle_bank_name?: string | null
-          settle_account_number?: string | null
-          settle_account_holder?: string | null
           created_at?: string
         }
         Relationships: []
@@ -148,6 +144,30 @@ export type Database = {
           account_number?: string | null
           account_holder?: string | null
           updated_at?: string
+        }
+        Relationships: []
+      }
+      settlements: {
+        Row: {
+          funding_id: string
+          bank_name: string
+          account_number: string
+          account_holder: string
+          created_at: string
+        }
+        Insert: {
+          funding_id: string
+          bank_name: string
+          account_number: string
+          account_holder: string
+          created_at?: string
+        }
+        Update: {
+          funding_id?: string
+          bank_name?: string
+          account_number?: string
+          account_holder?: string
+          created_at?: string
         }
         Relationships: []
       }

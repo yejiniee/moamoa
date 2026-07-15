@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-import type { Payment } from "@/lib/supabase/types";
+import type { PublicPayment } from "@/lib/supabase/types";
 
 function maskName(name: string): string {
   if (name.length <= 1) return name;
@@ -16,7 +16,7 @@ function maskName(name: string): string {
 }
 
 type Props = {
-  payments: Payment[];
+  payments: PublicPayment[];
 };
 
 export default function DonorRolling({ payments }: Props) {
