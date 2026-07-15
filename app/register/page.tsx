@@ -164,7 +164,7 @@ export default function RegisterPage() {
             <div className="bg-gray-50 rounded-xl p-4 flex flex-col gap-2 text-sm">
               <div className="flex justify-between">
                 <span className="text-gray-400">아이디</span>
-                <span className="font-semibold text-gray-900">yjcho0011@gmail.com</span>
+                <span className="font-semibold text-gray-900">test@example.com</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-400">비밀번호</span>
