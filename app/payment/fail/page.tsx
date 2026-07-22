@@ -1,13 +1,20 @@
 'use client'
 
-import { Suspense } from 'react'
+import { Suspense, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import Button from '@/components/ui/Button'
+import { reconcileFailedOrder } from './actions'
 
 function FailContent() {
   const searchParams = useSearchParams()
   const message = searchParams.get('message')
+  const orderId = searchParams.get('orderId')
+
+  // 결제창에서 실패/취소된 주문의 pending 기록을 정리한다(토스 재확인 기반이라 안전).
+  useEffect(() => {
+    if (orderId) reconcileFailedOrder(orderId)
+  }, [orderId])
 
   return (
     <div className="text-center w-full max-w-md bg-white rounded-2xl p-8 shadow-sm flex flex-col gap-4">
