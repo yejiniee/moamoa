@@ -9,9 +9,10 @@ const STALE_MINUTES = 15
 // 미확정(pending) 상태로 오래 방치된 결제를 토스에 실제 상태를 물어 일괄 보정하는 배치.
 // 웹훅이 유실됐거나 브라우저 confirm이 끊긴 경우의 최종 안전망이다.
 //
-// 크론(예: Vercel Cron)이 주기적으로 호출한다. 아무나 부르지 못하도록
-// CRON_SECRET을 Bearer 토큰으로 요구한다.
-export async function POST(req: NextRequest) {
+// 크론이 주기적으로 호출한다. 아무나 부르지 못하도록 CRON_SECRET을 Bearer 토큰으로 요구한다.
+// - Vercel Cron은 GET으로 호출하며 CRON_SECRET 환경변수가 있으면 Authorization 헤더를 자동 첨부한다.
+// - 외부 크론/수동 실행을 위해 POST도 동일하게 지원한다.
+async function handle(req: NextRequest) {
   const secret = process.env.CRON_SECRET
   if (!secret || req.headers.get('authorization') !== `Bearer ${secret}`) {
     return NextResponse.json({ error: '권한이 없습니다' }, { status: 401 })
@@ -41,3 +42,6 @@ export async function POST(req: NextRequest) {
 
   return NextResponse.json({ processed: (stale ?? []).length, ...tally })
 }
+
+export const GET = handle // Vercel Cron 호출용
+export const POST = handle // 외부 크론/수동 실행용

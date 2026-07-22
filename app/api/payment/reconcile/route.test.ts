@@ -42,7 +42,7 @@ vi.mock('@/lib/supabase/server', () => ({
   createServiceClient: () => makeClient(tables),
 }))
 
-const { POST } = await import('./route')
+const { POST, GET } = await import('./route')
 
 function makeReq(headers: Record<string, string>) {
   return {
@@ -83,6 +83,28 @@ describe('POST /api/payment/reconcile - 미확정 pending 복구 배치', () => 
     })))
 
     const res = await POST(makeReq({ authorization: 'Bearer secret-token' }))
+    const json = await res.json()
+
+    expect(res.status).toBe(200)
+    expect(tables.payments[0].status).toBe('confirmed')
+    expect(json.confirmed).toBe(1)
+  })
+
+  // Vercel Cron은 GET으로 호출하므로 GET도 동일하게 동작해야 한다.
+  it('GET도 시크릿이 없으면 401', async () => {
+    const res = await GET(makeReq({}))
+    expect(res.status).toBe(401)
+    expect(tables.payments[0].status).toBe('pending')
+  })
+
+  it('GET도 올바른 시크릿이면 보정한다(Vercel Cron 경로)', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => ({
+      ok: true,
+      status: 200,
+      json: async () => ({ status: 'DONE', totalAmount: 5000, paymentKey: 'pk_1' }),
+    })))
+
+    const res = await GET(makeReq({ authorization: 'Bearer secret-token' }))
     const json = await res.json()
 
     expect(res.status).toBe(200)
