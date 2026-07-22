@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServiceClient } from '@/lib/supabase/server'
+import { closeFundingIfTargetReached } from '@/lib/payments/settlement'
 
 export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => null)
@@ -101,20 +102,8 @@ export async function POST(req: NextRequest) {
     )
   }
 
-  // 목표금액 달성 시 자동 정산
-  const [{ data: allPayments }, { data: gifts }, { data: funding }] = await Promise.all([
-    supabase.from('payments').select('amount').eq('funding_id', payment.funding_id).eq('status', 'confirmed'),
-    supabase.from('gifts').select('target_amount').eq('funding_id', payment.funding_id),
-    supabase.from('fundings').select('status').eq('id', payment.funding_id).single(),
-  ])
-
-  if (funding?.status === 'active') {
-    const totalPaid = (allPayments ?? []).reduce((sum, p) => sum + p.amount, 0)
-    const totalTarget = (gifts ?? []).reduce((sum, g) => sum + g.target_amount, 0)
-    if (totalTarget > 0 && totalPaid >= totalTarget) {
-      await supabase.from('fundings').update({ status: 'closed' }).eq('id', payment.funding_id)
-    }
-  }
+  // 목표금액 달성 시 자동 정산(마감). 웹훅/복구 배치와 동일한 헬퍼를 사용한다.
+  await closeFundingIfTargetReached(supabase, payment.funding_id)
 
   return NextResponse.json({ success: true })
 }

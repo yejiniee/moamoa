@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServiceClient } from '@/lib/supabase/server'
+import { reconcilePayment, type PaymentRow } from '@/lib/payments/reconcile'
 
 // 토스가 결제 상태 변경을 서버로 통지하는 웹훅(PAYMENT_STATUS_CHANGED).
 //
@@ -58,37 +59,17 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: '결제 정보를 찾을 수 없습니다' }, { status: 404 })
   }
 
-  if (authoritative.status === 'DONE') {
-    if (payment.status === 'confirmed') {
-      return NextResponse.json({ ok: true }) // 이미 반영됨(멱등)
-    }
-    if (authoritative.totalAmount !== payment.amount) {
-      // 조회 금액과 저장 금액 불일치 → 확정하지 않음(이상 징후)
-      return NextResponse.json({ error: '결제 금액이 일치하지 않습니다' }, { status: 400 })
-    }
-    // 경합 시 다른 요청이 이미 확정한 결제를 덮지 않도록 pending일 때만 갱신한다.
-    await supabase
-      .from('payments')
-      .update({ status: 'confirmed', payment_key: paymentKey })
-      .eq('order_id', orderId)
-      .eq('status', 'pending')
-    return NextResponse.json({ ok: true })
+  // 웹훅/복구 배치와 공유하는 단일 결정 로직으로 보정한다.
+  const result = await reconcilePayment(supabase, payment as PaymentRow, {
+    status: authoritative.status,
+    totalAmount: authoritative.totalAmount,
+    paymentKey,
+  })
+
+  if (result === 'amount_mismatch') {
+    return NextResponse.json({ error: '결제 금액이 일치하지 않습니다' }, { status: 400 })
   }
 
-  if (
-    authoritative.status === 'CANCELED' ||
-    authoritative.status === 'EXPIRED' ||
-    authoritative.status === 'ABORTED'
-  ) {
-    // 아직 확정되지 않은 결제만 실패로 정리한다(confirmed는 건드리지 않음).
-    await supabase
-      .from('payments')
-      .update({ status: 'failed' })
-      .eq('order_id', orderId)
-      .eq('status', 'pending')
-    return NextResponse.json({ ok: true })
-  }
-
-  // READY/IN_PROGRESS/WAITING_FOR_DEPOSIT 등 비최종 상태 → 아직 반영할 것 없음
+  // confirmed/failed/noop 모두 정상 처리로 간주(토스가 재시도하지 않도록 200)
   return NextResponse.json({ ok: true })
 }
